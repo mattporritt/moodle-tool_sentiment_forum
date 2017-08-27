@@ -25,7 +25,40 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($ADMIN->fulltree) {
-   // TODO: Define the plugin settings page.
-   // https://docs.moodle.org/dev/Admin_settings
+
+global $PAGE;
+
+if ($hassiteconfig) {
+    $settings = new admin_settingpage('tool_sentiment_forum', get_string('pluginname', 'tool_sentiment_forum'));
+    $ADMIN->add('tools', $settings);
+
+    $settings->add(new admin_setting_heading(
+            'tool_sentiment_forum_settings',
+            '',
+            get_string('pluginnamedesc', 'tool_sentiment_forum')
+            ));
+
+    if (! during_initial_install ()) {
+        // General Settings.
+        $settings->add(new admin_setting_configtext('tool_sentiment_forum/username',
+                get_string('username', 'tool_sentiment_forum' ),
+                get_string('username_desc', 'tool_sentiment_forum'),
+                '', PARAM_TEXT));
+
+       $settings->add(new admin_setting_configpasswordunmask('tool_sentiment_forum/password',
+                get_string('password', 'tool_sentiment_forum' ),
+                get_string('password_desc', 'tool_sentiment_forum'),
+                ''));
+
+       $settings->add(new admin_setting_configtext('tool_sentiment_forum/tokenendpoint',
+                get_string('tokenendpoint',      'tool_sentiment_forum'),
+                get_string('tokenendpoint_desc', 'tool_sentiment_forum'),
+               'https://gateway.watsonplatform.net/authorization/api/v1/token', PARAM_URL));
+
+       $settings->add(new admin_setting_configtext('tool_sentiment_forum/apiendpoint',
+                get_string('apiendpoint',      'tool_sentiment_forum'),
+                get_string('apiendpoint_desc', 'tool_sentiment_forum'),
+                'https://gateway.watsonplatform.net/natural-language-understanding/api/v1', PARAM_URL));
+
+    }
 }

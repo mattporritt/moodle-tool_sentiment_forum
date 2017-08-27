@@ -26,3 +26,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Forum Sentiment Analysis';
+$string['pluginnamedesc'] = 'Forum Sentiment Analysis configuration settings.';
+$string['username'] = 'Username';
+$string['username_desc'] = 'IBM Bluemix username';
+$string['password'] = 'Password';
+$string['password_desc'] = 'IBM Bluemix password';
+$string['tokenendpoint'] = 'Token Endpoint';
+$string['tokenendpoint_desc'] = 'IBM Bluemix token generator endpoint URL';
+$string['apiendpoint'] = 'API endpoint';
+$string['apiendpoint_desc'] = 'IBM Bluemix API endpoint URL';
