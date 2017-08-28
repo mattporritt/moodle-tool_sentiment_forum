@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Tool functions defined here.
  *
  * @package     tool_sentiment_forum
  * @copyright   2017 Matt Porritt <mattp@catalyst-au.net>
@@ -24,8 +24,16 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'tool_sentiment_forum';
-$plugin->release = '2017082801';
-$plugin->version = 2017082801;
-$plugin->requires = 2017051500;
-$plugin->maturity = MATURITY_ALPHA;
+/**
+ * Inject the competencies elements into all moodle module settings forms.
+ *
+ * @param moodleform $formwrapper The moodle quickforms wrapper object.
+ * @param MoodleQuickForm $mform The actual form object (required to modify the form).
+ */
+function tool_sentiment_forum_coursemodule_standard_elements($formwrapper, $mform) {
+    global $CFG, $COURSE;
+
+    error_log($formwrapper->get_current()->modulename);
+
+    $mform->addElement('header', 'competenciessection', get_string('competencies', 'core_competency'));
+}
