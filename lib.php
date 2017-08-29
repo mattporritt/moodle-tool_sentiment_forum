@@ -31,9 +31,16 @@ defined('MOODLE_INTERNAL') || die();
  * @param MoodleQuickForm $mform The actual form object (required to modify the form).
  */
 function tool_sentiment_forum_coursemodule_standard_elements($formwrapper, $mform) {
-    global $CFG, $COURSE;
+    $module = $formwrapper->get_current()->modulename;
 
-    error_log($formwrapper->get_current()->modulename);
+    if ($module == 'forum') { // Only apply sentiment settings to forums.
+        $mform->addElement('header', 'sentimentsection',
+                get_string('sentimentsection', 'tool_sentiment_forum'));
 
-    $mform->addElement('header', 'competenciessection', get_string('competencies', 'core_competency'));
+        $mform->addElement('advcheckbox', 'sentimentenabled',
+                get_string('sentimentenabled', 'tool_sentiment_forum'),
+                get_string('sentimentenabled_label', 'tool_sentiment_forum'),
+                false, array(0, 1));
+    }
+
 }
