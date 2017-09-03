@@ -41,6 +41,30 @@ function tool_sentiment_forum_coursemodule_standard_elements($formwrapper, $mfor
                 get_string('sentimentenabled', 'tool_sentiment_forum'),
                 get_string('sentimentenabled_label', 'tool_sentiment_forum'),
                 false, array(0, 1));
+
     }
 
 }
+
+
+
+/**
+ * Hook the add/edit of the course module.
+ *
+ * @param stdClass $data Data from the form submission.
+ * @param stdClass $course The course.
+ */
+function tool_sentiment_forum_coursemodule_edit_post_actions($data, $course) {
+    $module = $data->modulename;
+    if ($module == 'forum') { // Only apply sentiment settings to forums.
+        // save sentiment analysis in DB
+        error_log(print_r($data->sentimentenabled, true));
+    }
+
+    return $data;
+}
+
+function ool_sentiment_forum_pre_course_module_delete(stdClass $cm) {
+ // TODO: Handle module deletion;
+}
+
