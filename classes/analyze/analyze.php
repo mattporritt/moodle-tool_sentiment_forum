@@ -68,7 +68,16 @@ class analyze {
      * @return array $posts array of post ids.
      */
     public function get_unanalyzed_posts($forumid) {
-        $posts = array();
+        global $DB;
+
+        $posts = $DB->get_records_sql('SELECT * FROM {table} WHERE foo = ?', array('bar'));
+
+//      select f.* from mdl_forum_posts f
+//         left join mdl_forum_discussions fd
+//         on f.discussion = fd.id
+//         left join mdl_sentiment_forum_posts sfp
+//         on sfp.postid = f.id
+//         where sfp.timemodified is null and fd.forum = 4;
 
         return $posts;
     }
