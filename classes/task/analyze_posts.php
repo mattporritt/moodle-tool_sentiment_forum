@@ -27,6 +27,7 @@ namespace tool_sentiment_forum\task;
 
 defined('MOODLE_INTERNAL') || die();
 
+use tool_sentiment_forum\analyze\analyze;
 
 /**
  * Class to perform sentiment analysis on forum posts.
@@ -53,8 +54,19 @@ class analyze_posts extends \core\task\scheduled_task {
      * @see \core\task\task_base::execute()
      */
     public function execute() {
-        $config = get_config('tool_sentiment_forum');
-        mtrace('outputy mcoutput ...');
+        $analyzer = new analyze();
+
+        mtrace('Getting Forums to perform sentinment analysis on...');
+        $forums = $analyzer->get_enabled_forums();
+
+        foreach ($forums as $forum) {
+            $forumid = $forum->forumid;
+            mtrace('Analyzing forum ID: ' . $forumid . '...');
+            $analyzer->analyze_forum($forumid);
+
+        }
+
+
 
     }
 }
