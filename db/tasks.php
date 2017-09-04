@@ -15,28 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin strings are defined here.
+ * Task to perform sentiment analysis on forum posts.
  *
  * @package     tool_sentiment_forum
- * @category    string
+ * @category    task
  * @copyright   2017 Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Forum Sentiment Analysis';
-$string['pluginnamedesc'] = 'Forum Sentiment Analysis configuration settings.';
-
-$string['analyzeposts'] = 'Perform sentiment analysis on forum posts';
-$string['apiendpoint'] = 'API endpoint';
-$string['apiendpoint_desc'] = 'IBM Bluemix API endpoint URL';
-$string['password'] = 'Password';
-$string['password_desc'] = 'IBM Bluemix password';
-$string['sentimentenabled'] = 'Sentiment analysis';
-$string['sentimentenabled_label'] = 'Enable';
-$string['sentimentsection'] = 'Sentiment analysis';
-$string['tokenendpoint'] = 'Token Endpoint';
-$string['tokenendpoint_desc'] = 'IBM Bluemix token generator endpoint URL';
-$string['username'] = 'Username';
-$string['username_desc'] = 'IBM Bluemix username';
+$tasks = array(
+        array(
+                'classname' => 'tool_sentiment_forum\task\analyze_posts',
+                'blocking' => 0,
+                'minute' => '*',
+                'hour' => '*',
+                'dayofweek' => '*',
+                'month' => '*'
+        )
+);
