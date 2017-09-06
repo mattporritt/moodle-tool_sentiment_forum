@@ -50,6 +50,7 @@ class watson_api {
         $this->password = $this->config->password;
         $this->tokenendpoint= $this->config->tokenendpoint;
         $this->apiendpoint = $this->config->apiendpoint;
+        $this->token = '';
 
         // Allow the caller to instansite the Guzzle client
         // with a custom handler.
@@ -67,7 +68,7 @@ class watson_api {
      *
      * @return string $token the API acesss token.
      */
-    public function generate_token() {
+    private function generate_token() {
         $url = $this->tokenendpoint;
         $authcreds = base64_encode ($this->username.':'.$this->password);
         $authstring = 'Basic '.$authcreds;
@@ -79,6 +80,53 @@ class watson_api {
 
         return $accesstoken;
 
+    }
+
+    /**
+     * Calls the Watson API.
+     *
+     * @param string $url Watson service endpoint to call
+     * @param bool $retry
+     * @return object $responseobj The response recevied from the API
+     */
+    public function call_api($url, $packet) {
+
+        // Sort out token to be used in analysis calls.
+        if ($this->token == '') {
+            $this->token = $this->generate_token();
+        }
+
+        $params = ['headers' => ['Content-Type' => 'application/json',
+                'X-Watson-Authorization-Token' => $this->token ]];
+
+        // Requests that receive a 4xx or 5xx response will throw a
+        // Guzzle\Http\Exception\BadResponseException. We want to
+        // handle this in a sane way and provide the caller with
+        // a useful response. So we catch the error and return the
+        // response.
+        try {
+            $response = $this->client->request('POST', $url, $params);
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            $response = $e->getResponse();
+        }
+
+        $responsecode = $response->getStatusCode();
+        $responseobj = json_decode($response->getBody(), true);
+
+        return $responseobj;
+    }
+
+    public function analyze_sentiment($text) {
+        $url = $this->apiendpoint . '/v1/analyze?version=2017-02-27';
+
+
+//         curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{ \
+//    "text": "you all suck alot.", \
+//    "features": { \
+//      "emotion": {}, \
+//      "sentiment":{} \
+//    } \
+//  }' 'https://watson-api-explorer.mybluemix.net/natural-language-understanding/api/v1/analyze?version=2017-02-27'
     }
 
 }

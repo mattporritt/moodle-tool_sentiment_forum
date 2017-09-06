@@ -91,15 +91,18 @@ class analyze {
      */
     public function analyze_forum($forumid){
         $posts = $this->get_unanalyzed_posts($forumid);
+        $watson = new watson_api();
 
         foreach ($posts as $post) {
+            // Get text from forum post.
             $subject = format_string($post->subject, true);
             $message = format_string($post->message, true);
             $analyzestring = $subject . ' ' . $message;
+
+            // Analyze string.
+            $sentiment = $watson->analyze_sentiment($analyzestring);
         }
 
-        $watson = new watson_api();
-        $watson->generate_token();
 
         return false;
     }
