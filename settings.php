@@ -58,7 +58,7 @@ if ($hassiteconfig) {
        $settings->add(new admin_setting_configtext('tool_sentiment_forum/apiendpoint',
                 get_string('apiendpoint',      'tool_sentiment_forum'),
                 get_string('apiendpoint_desc', 'tool_sentiment_forum'),
-                'https://gateway.watsonplatform.net/natural-language-understanding/api/v1', PARAM_URL));
+                'https://gateway.watsonplatform.net/natural-language-understanding/api', PARAM_URL));
 
     }
 }

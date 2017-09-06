@@ -26,7 +26,7 @@ namespace tool_sentiment_forum\analyze;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
+use tool_sentiment_forum\watson\watson_api;
 
 /**
  * Forum sentiment analyzer class.
@@ -97,6 +97,9 @@ class analyze {
             $message = format_string($post->message, true);
             $analyzestring = $subject . ' ' . $message;
         }
+
+        $watson = new watson_api();
+        $watson->generate_token();
 
         return false;
     }
