@@ -70,14 +70,15 @@ class analyze {
     public function get_unanalyzed_posts($forumid) {
         global $DB;
 
-        $posts = $DB->get_records_sql('SELECT * FROM {table} WHERE foo = ?', array('bar'));
-
-//      select f.* from mdl_forum_posts f
-//         left join mdl_forum_discussions fd
-//         on f.discussion = fd.id
-//         left join mdl_sentiment_forum_posts sfp
-//         on sfp.postid = f.id
-//         where sfp.timemodified is null and fd.forum = 4;
+        $posts = $DB->get_records_sql(
+                'SELECT f.* FROM {forum_posts} f
+                LEFT JOIN {forum_discussions} fd
+                ON f.discussion = fd.id
+                LEFT JOIN mdl_sentiment_forum_posts sfp
+                ON sfp.postid = f.id
+                WHERE sfp.timemodified is null AND fd.forum = ?',
+                array($forumid)
+                );
 
         return $posts;
     }
@@ -90,6 +91,13 @@ class analyze {
      */
     public function analyze_forum($forumid){
         $posts = $this->get_unanalyzed_posts($forumid);
+
+        foreach ($posts as $post) {
+            $subject = format_string($post->subject, true);
+            $message = format_string($post->message, true);
+            $analyzestring = $subject . ' ' . $message;
+        }
+
         return false;
     }
 }

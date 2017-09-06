@@ -37,7 +37,12 @@ function tool_sentiment_forum_coursemodule_standard_elements($formwrapper, $mfor
     if ($module == 'forum') { // Only apply sentiment settings to forums.
         // Get existing config
         $forumid = $formwrapper->get_current()->id;
-        $enabled = $DB->get_field('sentiment_forum', 'enabled', array ('forumid' => $forumid));
+
+        if ($forumid != '') {
+            $enabled = $DB->get_field('sentiment_forum', 'enabled', array ('forumid' => $forumid));
+        } else {
+            $enabled = 0;
+        }
 
         $mform->addElement('header', 'sentimentsection',
                 get_string('sentimentsection', 'tool_sentiment_forum'));
