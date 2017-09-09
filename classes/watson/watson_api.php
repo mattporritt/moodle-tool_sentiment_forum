@@ -63,6 +63,60 @@ class watson_api {
     }
 
     /**
+     * Constructs the Guzzle Proxy settings array
+     * based on Moodle's server proxy admin settings.
+     *
+     * @return array $proxy Proxy settings for Guzzle to use.
+     */
+    private function proxyconstruct() {
+        global $CFG;
+        $proxy = array();
+        $options = array();
+        $protocol = 'tcp';
+        $auth = '';
+        $server = '';
+        $uri = '';
+
+        if (! empty ( $CFG->proxyhost )) {
+            // Set the server details.
+            if (empty ( $CFG->proxyport )) {
+                $server = $CFG->proxyhost;
+            } else {
+                $server = $CFG->proxyhost . ':' . $CFG->proxyport;
+            }
+
+            // Set the authentication details.
+            if (! empty ( $CFG->proxyuser ) and ! empty ( $CFG->proxypassword )) {
+                $auth = $CFG->proxyuser . ':' . $CFG->proxypassword . '@';
+            }
+
+            // Set the proxy type.
+            if (! empty ( $CFG->proxytype ) && $CFG->proxytype == 'SOCKS5') {
+                $protocol = 'socks5';
+            }
+
+            // Construct proxy URI.
+            $uri = $protocol . '://' . $auth . $server;
+
+            // Populate proxy options array.
+            $options['http'] = $uri;
+            $options['https'] = $uri;
+
+            // Set excluded domains.
+            if (! empty ($CFG->proxybypass) ) {
+                $nospace = preg_replace('/\s/', '', $CFG->proxybypass);
+                $options['no'] = explode(',', $nospace);
+            }
+
+            // Finally populate proxy settings array.
+            $proxy['proxy'] = $options;
+
+        }
+
+        return $proxy;
+    }
+
+    /**
      * Generates OAuth token from stored key and secret deatils.
      * Token is used to make API calls.
      *
@@ -89,26 +143,30 @@ class watson_api {
      * @param bool $retry
      * @return object $responseobj The response recevied from the API
      */
-    public function call_api($url, $packet) {
+    public function call_api($url, $params) {
 
         // Sort out token to be used in analysis calls.
         if ($this->token == '') {
             $this->token = $this->generate_token();
         }
+error_log($this->token);
+        $headers= ['headers' => ['Content-Type' => 'application/json',
+                                 'X-Watson-Authorization-Token' => $this->token ]];
 
-        $params = ['headers' => ['Content-Type' => 'application/json',
-                'X-Watson-Authorization-Token' => $this->token ]];
+        $psr7request = new \GuzzleHttp\Psr7\Request('POST', $url, $headers, $params);
+        $proxy = $this->proxyconstruct();
 
         // Requests that receive a 4xx or 5xx response will throw a
         // Guzzle\Http\Exception\BadResponseException. We want to
         // handle this in a sane way and provide the caller with
         // a useful response. So we catch the error and return the
-        // response.
+        // resposne.
         try {
-            $response = $this->client->request('POST', $url, $params);
+            $response = $this->client->send($psr7request, $proxy);
         } catch (\GuzzleHttp\Exception\BadResponseException $e) {
             $response = $e->getResponse();
         }
+        error_log(print_r($response, true));
 
         $responsecode = $response->getStatusCode();
         $responseobj = json_decode($response->getBody(), true);
@@ -118,7 +176,18 @@ class watson_api {
 
     public function analyze_sentiment($text) {
         $url = $this->apiendpoint . '/v1/analyze?version=2017-02-27';
+        $params = ['text' => $text,
+                   'features' => [
+                           'emotion' => [],
+                           'sentiment' => []
+                   ]
+        ];
+        $jsonparams = json_encode($params);
+        error_log($url);
+        error_log($jsonparams);
 
+        $response = $this->call_api($url, $jsonparams);
+        
 
 //         curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{ \
 //    "text": "you all suck alot.", \
