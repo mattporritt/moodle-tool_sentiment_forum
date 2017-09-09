@@ -144,16 +144,20 @@ class watson_api {
      * @return object $responseobj The response recevied from the API
      */
     public function call_api($url, $params) {
+       // $url = 'https://requestb.in/wptm0swp';
 
         // Sort out token to be used in analysis calls.
         if ($this->token == '') {
             $this->token = $this->generate_token();
         }
-error_log($this->token);
-        $headers= ['headers' => ['Content-Type' => 'application/json',
-                                 'X-Watson-Authorization-Token' => $this->token ]];
 
-        $psr7request = new \GuzzleHttp\Psr7\Request('POST', $url, $headers, $params);
+        $headers= ['Content-Type' => 'application/json',
+                                 'Accept' => 'application/json',
+                                 'X-Watson-Authorization-Token' => $this->token ];
+
+        $jsonparams = json_encode($params);
+
+        $psr7request = new \GuzzleHttp\Psr7\Request('POST', $url, $headers, $jsonparams);
         $proxy = $this->proxyconstruct();
 
         // Requests that receive a 4xx or 5xx response will throw a
@@ -166,7 +170,6 @@ error_log($this->token);
         } catch (\GuzzleHttp\Exception\BadResponseException $e) {
             $response = $e->getResponse();
         }
-        error_log(print_r($response, true));
 
         $responsecode = $response->getStatusCode();
         $responseobj = json_decode($response->getBody(), true);
@@ -178,24 +181,17 @@ error_log($this->token);
         $url = $this->apiendpoint . '/v1/analyze?version=2017-02-27';
         $params = ['text' => $text,
                    'features' => [
-                           'emotion' => [],
-                           'sentiment' => []
+                           'emotion' => new \stdClass(),
+                           'sentiment' => new \stdClass()
                    ]
         ];
-        $jsonparams = json_encode($params);
-        error_log($url);
-        error_log($jsonparams);
 
-        $response = $this->call_api($url, $jsonparams);
-        
+        $response = $this->call_api($url, $params);
 
-//         curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{ \
-//    "text": "you all suck alot.", \
-//    "features": { \
-//      "emotion": {}, \
-//      "sentiment":{} \
-//    } \
-//  }' 'https://watson-api-explorer.mybluemix.net/natural-language-understanding/api/v1/analyze?version=2017-02-27'
+        $sentiment = $response['sentiment']['document']['score'];
+        $emotion = $response['emotion']['document']['emotion'];
+
+        return array($sentiment, $emotion);
     }
 
 }

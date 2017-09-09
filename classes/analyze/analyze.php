@@ -100,7 +100,10 @@ class analyze {
             $analyzestring = $subject . ' ' . $message;
 
             // Analyze string.
-            $sentiment = $watson->analyze_sentiment($analyzestring);
+            list($sentiment, $emotion) = $watson->analyze_sentiment($analyzestring);
+
+            error_log($sentiment);
+            error_log(print_r($emotion, true));
         }
 
 
