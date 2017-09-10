@@ -143,7 +143,7 @@ class watson_api {
      * @param bool $retry
      * @return object $responseobj The response recevied from the API
      */
-    public function call_api($url, $params) {
+    public function call_api($url, $params, $retry=true) {
        // $url = 'https://requestb.in/wptm0swp';
 
         // Sort out token to be used in analysis calls.
@@ -173,6 +173,14 @@ class watson_api {
 
         $responsecode = $response->getStatusCode();
         $responseobj = json_decode($response->getBody(), true);
+
+        // If we get a 401 response code it is likely our Auth token has expired.
+        // In this case we generate a new token and retry getting sentiment.
+        // We only retry once.
+        if ($responsecode == 401 && $retry == true) {
+            $this->token = $this->generate_token();
+            $responseobj = $this->call_api($url, $params, false);
+        }
 
         return $responseobj;
     }
