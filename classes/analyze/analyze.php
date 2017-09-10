@@ -111,9 +111,77 @@ class analyze {
         return $result;
     }
 
+    /**
+     * Given a forum ID, update the running sentiment average
+     * for that forum.
+     *
+     * @param int $forumid The ID of the forum to update
+     * @return boolean $forum Success status of update.
+     */
     public function update_sentiment_forum($forumid) {
         global $DB;
-        
+
+        $count = 0;
+        $start = 0;
+        $limit = 1000;
+        $step = 1000;
+        $forum = false;
+
+        $totalsentiment = 0;
+        $totalsadness = 0;
+        $totaljoy = 0;
+        $totalfear = 0;
+        $totalanger = 0;
+        $totaldisgust = 0;
+
+        // Get 1000 rows of data from the log table order by oldest first.
+        // Keep getting records 1000 at a time until we run out of records or max execution time is reached.
+        while (true){
+            $results = $DB->get_records('sentiment_forum_posts', array('forumid' => $forumid), '', '*', $start, $limit);
+
+            if (empty($results)) {
+                break; // Stop trying to get records when we run out;
+            }
+
+            // Increment record start position for next iteration.
+            $start += $step;
+
+            // Update running totals.
+            foreach ($results as $result) {
+                $count++;
+                $totalsentiment += $result->sentiment;
+                $totalsadness += $result->sadness;
+                $totaljoy += $result->joy;
+                $totalfear += $result->fear;
+                $totalanger += $result->anger;
+                $totaldisgust += $result->disgust;
+            }
+        }
+
+        // If we have processed posts, update parent with averages.
+        if ($count > 0) {
+            $avgsenitment = $totalsentiment / $count;
+            $avgsadness = $totalsadness / $count;
+            $avgjoy = $totaljoy / $count;
+            $avgfear = $totalfear / $count;
+            $avganger = $totalanger / $count;
+            $avgdisgust = $totaldisgust / $count;
+
+            $tableid = $DB->get_field('sentiment_forum', 'id', array('forumid' => $forumid));
+            $record = new \stdClass();
+            $record->id = $tableid;
+            $record->sentiment = $avgsenitment;
+            $record->sadness = $avgsadness;
+            $record->joy = $avgjoy;
+            $record->fear = $avgfear;
+            $record->anger = $avganger;
+            $record->disgust = $avgdisgust;
+            $record->timemodified = time();
+
+            $forum = $DB->update_record('sentiment_forum', $record);
+        }
+
+        return $forum;
     }
 
     /**
@@ -135,13 +203,14 @@ class analyze {
             // Analyze string.
             list($sentiment, $emotion) = $watson->analyze_sentiment($analyzestring);
 
-            error_log($sentiment);
-            error_log(print_r($emotion, true));
-
+            // Update Database with post sentiment.
             $this->insert_sentiment_post($forumid, $post, $sentiment, $emotion);
         }
 
-        $this->update_sentiment_forum($forumid);
+        // If new posts have been analyzed update forum sentiment.
+        if (!empty($posts)) {
+            $this->update_sentiment_forum($forumid);
+        }
 
         return true;
     }
