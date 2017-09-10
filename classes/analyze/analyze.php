@@ -84,6 +84,39 @@ class analyze {
     }
 
     /**
+     * Store individual forum post sentiment in Moodle database
+     *
+     * @param int $forumid The forum ID.
+     * @param object $post The post ID.
+     * @param int $sentiment The sentiment value
+     * @param array $emotion Array of emotions.
+     * @return boolean $result true on record insert
+     */
+    public function insert_sentiment_post($forumid, $post, $sentiment, $emotion) {
+        global $DB;
+
+        $record = new \stdClass();
+        $record->forumid = $forumid;
+        $record->postid = $post->id;
+        $record->sentiment = $sentiment;
+        $record->sadness = $emotion['sadness'];
+        $record->joy = $emotion['joy'];
+        $record->fear = $emotion['fear'];
+        $record->anger = $emotion['anger'];
+        $record->disgust = $emotion['disgust'];
+        $record->timemodified = time();
+
+        $result = $DB->insert_record('sentiment_forum_posts', $record);
+
+        return $result;
+    }
+
+    public function update_sentiment_forum($forumid) {
+        global $DB;
+        
+    }
+
+    /**
      * Given a form id perform sentiment analysis
      * on all posts in that forum.
      *
@@ -104,9 +137,12 @@ class analyze {
 
             error_log($sentiment);
             error_log(print_r($emotion, true));
+
+            $this->insert_sentiment_post($forumid, $post, $sentiment, $emotion);
         }
 
+        $this->update_sentiment_forum($forumid);
 
-        return false;
+        return true;
     }
 }

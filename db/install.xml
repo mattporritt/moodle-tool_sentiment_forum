@@ -9,12 +9,12 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" UNIQUE="true" COMMENT="primary id for core forum table"/>
         <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="1" COMMENT="is sentiment enabled for this forum"/>
-        <FIELD NAME="sentiment" TYPE="number" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="the forum sentiment"/>
-        <FIELD NAME="sadness" TYPE="number" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="joy" TYPE="number" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="fear" TYPE="number" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="disgust" TYPE="number" LENGTH="1" NOTNULL="false" SEQUENCE="false" DECIMALS="0"/>
-        <FIELD NAME="anger" TYPE="number" LENGTH="1" NOTNULL="false" SEQUENCE="false" DECIMALS="0"/>
+        <FIELD NAME="sentiment" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false"  DECIMALS="6" COMMENT="the forum sentiment"/>
+        <FIELD NAME="sadness" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
+        <FIELD NAME="joy" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
+        <FIELD NAME="fear" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
+        <FIELD NAME="disgust" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
+        <FIELD NAME="anger" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -29,12 +29,12 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" UNIQUE="false" COMMENT="primary id for core forum table"/>
         <FIELD NAME="postid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" UNIQUE="false" COMMENT="primary id for core posts table"/>
-        <FIELD NAME="sentiment" TYPE="number" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="the forum sentiment"/>
-        <FIELD NAME="sadness" TYPE="number" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="joy" TYPE="number" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="fear" TYPE="number" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="disgust" TYPE="number" LENGTH="1" NOTNULL="false" SEQUENCE="false" DECIMALS="0"/>
-        <FIELD NAME="anger" TYPE="number" LENGTH="1" NOTNULL="false" SEQUENCE="false" DECIMALS="0"/>
+        <FIELD NAME="sentiment" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false"  DECIMALS="6" COMMENT="the post sentiment"/>
+        <FIELD NAME="sadness" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
+        <FIELD NAME="joy" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
+        <FIELD NAME="fear" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
+        <FIELD NAME="disgust" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
+        <FIELD NAME="anger" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
