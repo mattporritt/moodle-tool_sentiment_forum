@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Inject the competencies elements into all moodle module settings forms.
+ * Inject the sentiment analysis elements into all moodle forum settings forms.
  *
  * @param moodleform $formwrapper The moodle quickforms wrapper object.
  * @param MoodleQuickForm $mform The actual form object (required to modify the form).
@@ -85,6 +85,33 @@ function tool_sentiment_forum_coursemodule_edit_post_actions($data, $course) {
 
 function tool_sentiment_forum_pre_course_module_delete(stdClass $cm) {
  // TODO: Handle module deletion;
+}
+
+/**
+ * Adds a sentiment forum report link to the course admin menu.
+ *
+ * @param navigation_node $navigation The navigation node to extend
+ * @param stdClass $course The course to object for the tool
+ * @param context $context The context of the course
+ * @return void|null return null if we don't want to display the node.
+ */
+function tool_sentiment_forum_extend_navigation_course($navigation, $course, $context) {
+    global $PAGE;
+
+    // Only add this settings item on non-site course pages.
+    if (!$PAGE->course || $PAGE->course->id == SITEID) {
+        return null;
+    }
+
+    // Only show this report if there are sentiment enabled forums in this course.
+    // TODO: this
+
+    $url = new moodle_url('/admin/tool/sentiment_forum/report.php', array('contextid' => $context->id));
+    $pluginname = get_string('pluginname', 'tool_sentiment_forum');
+
+    // TODO: add capability check.
+    // Add the report link.
+    $navigation->add($pluginname, $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
 }
 
 /**
