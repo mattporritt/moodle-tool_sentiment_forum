@@ -115,6 +115,16 @@ class analyze {
     }
 
     public function get_forum_emotion_trend($forumid) {
+        global $DB;
+
+        $emotionrecords = $DB->get_records_select(
+                'sentiment_forum_posts',
+                'sadness <> 0 AND joy <> 0 AND fear <> 0 AND disgust <> 0 AND anger <> 0 AND forumid = :forumid',
+                array('forumid' => $forumid),
+                'timeposted ASC'
+                );
+
+        return $emotionrecords;
 
     }
 
@@ -134,7 +144,7 @@ class analyze {
                 ON f.discussion = fd.id
                 LEFT JOIN mdl_sentiment_forum_posts sfp
                 ON sfp.postid = f.id
-                WHERE sfp.timemodified is null AND fd.forum = ?',
+                WHERE sfp.timeposted is null AND fd.forum = ?',
                 array($forumid)
                 );
 
@@ -162,7 +172,7 @@ class analyze {
         $record->fear = $emotion['fear'];
         $record->anger = $emotion['anger'];
         $record->disgust = $emotion['disgust'];
-        $record->timemodified = time();
+        $record->timeposted = $post->created;
 
         $result = $DB->insert_record('sentiment_forum_posts', $record);
 

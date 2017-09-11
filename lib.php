@@ -159,7 +159,7 @@ function get_chart_forum_sentiment($forumid) {
 
     // Setup chart series and labels
     $series = new core\chart_series(
-            get_string('chart_forum_sentimentpercentage', 'tool_sentiment_forum'),
+            get_string('chart_forum_sentimentrating', 'tool_sentiment_forum'),
             [$sentiment]
             );
     $labels = ['sentiment'];
@@ -168,7 +168,7 @@ function get_chart_forum_sentiment($forumid) {
     $yaxis = new \core\chart_axis();
     $yaxis->set_min(-100);
     $yaxis->set_max(100);
-    $yaxis->set_label(get_string('chart_forum_sentimentpercentage', 'tool_sentiment_forum'));
+    $yaxis->set_label(get_string('chart_forum_sentimentrating', 'tool_sentiment_forum'));
 
     // Setup chart
     $chart->add_series($series);
@@ -202,7 +202,7 @@ function get_chart_forum_emotions($forumid) {
 
     // Setup chart series and labels
     $series = new core\chart_series(
-            get_string('chart_forum_emotionpercentage', 'tool_sentiment_forum'),
+            get_string('chart_forum_emotionrating', 'tool_sentiment_forum'),
             $seriesarray
             );
     $labels = $labelsarray;
@@ -211,12 +211,133 @@ function get_chart_forum_emotions($forumid) {
     $yaxis = new \core\chart_axis();
     $yaxis->set_min(0);
     $yaxis->set_max(100);
-    $yaxis->set_label(get_string('chart_forum_emotionpercentage', 'tool_sentiment_forum'));
+    $yaxis->set_label(get_string('chart_forum_emotionrating', 'tool_sentiment_forum'));
 
     // Setup chart
     $chart->add_series($series);
     $chart->set_labels($labels);
     $chart->set_title(get_string('chart_forum_emotion_title', 'tool_sentiment_forum'));
+    $chart->set_yaxis($yaxis);
+
+    return $chart;
+
+}
+
+/**
+ * Given a Forum ID, construct a bar chart
+ * to display overall forum sentiment.
+ *
+ * @param int $forumid Forum ID
+ * @return \core\chart_bar $chart The constructed chart object.
+ */
+function get_chart_forum_emotion_trend($forumid) {
+    global $CFG;
+
+    $analyzer = new analyze();
+    $emotionrecords = $analyzer->get_forum_emotion_trend($forumid);
+
+    $chart = new \core\chart_line();
+    $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+
+    // Split returned records up into weeks
+    $weektime = 0;
+    $weekrecords= array();
+    $avgarray = array();
+    foreach ($emotionrecords as $record) {
+        if($record->timeposted > $weektime){
+            $weektime = $record->timeposted + 604800;
+            $weekarray= array();
+        }
+        $weekarray[] = $record;
+        $weekrecords[$weektime] = $weekarray;
+
+    }
+
+    // Average weekly record groups
+    $weekavg = array();
+    foreach ($weekrecords as $time => $week) {
+
+        $count = count($week);
+        $sadnesstotal = 0;
+        $joytotal = 0;
+        $feartotal = 0;
+        $disgusttotal = 0;
+        $angertotal = 0;
+
+        foreach ($week as $record) {
+            $sadnesstotal+= $record->sadness;
+            $joytotal+= $record->joy;
+            $feartotal+= $record->fear;
+            $disgusttotal+= $record->disgust;
+            $angertotal+= $record->anger;
+        }
+
+        $recordavg = new \stdClass();
+        $recordavg->sadnessavg = ($sadnesstotal * 100) / $count;
+        $recordavg->joyavg = ($joytotal * 100) / $count;
+        $recordavg->fearavg = ($feartotal * 100) / $count;
+        $recordavg->disgustavg = ($disgusttotal * 100) / $count;
+        $recordavg->angeravg = ($angertotal * 100) / $count;
+
+        $weekavg[$time] = $recordavg;
+    }
+
+    // Split out our averaged data in a chart format.
+    $sadness = array();
+    $joy = array();
+    $fear = array();
+    $disgust = array();
+    $anger = array();
+    $timeposted = array();
+
+    foreach ($weekavg as $timestamp => $record) {
+        $sadness[] = $record->sadnessavg;
+        $joy[] = $record->joyavg;
+        $fear[] = $record->fearavg;
+        $disgust[] = $record->disgustavg;
+        $anger[] = $record->angeravg;
+        $timeposted[] = userdate($timestamp- DAYSECS, get_string('strftimedate'), $CFG->timezone);
+    }
+
+    // Setup chart series and labels
+    $sadnessseries = new core\chart_series(
+            get_string('chart_forum_emotionsadness', 'tool_sentiment_forum'),
+            $sadness
+            );
+    $joyseries = new core\chart_series(
+            get_string('chart_forum_emotionjoy', 'tool_sentiment_forum'),
+            $joy
+            );
+    $fearseries = new core\chart_series(
+            get_string('chart_forum_emotionfear', 'tool_sentiment_forum'),
+            $fear
+            );
+    $disgustseries = new core\chart_series(
+            get_string('chart_forum_emotiondisgust', 'tool_sentiment_forum'),
+            $disgust
+            );
+    $angerseries = new core\chart_series(
+            get_string('chart_forum_emotionanger', 'tool_sentiment_forum'),
+            $anger
+            );
+
+    $labels = $timeposted;
+
+    // Customise Y axis.
+    $yaxis = new \core\chart_axis();
+    $yaxis->set_min(0);
+    $yaxis->set_max(100);
+    $yaxis->set_label(get_string('chart_forum_sentimentrating', 'tool_sentiment_forum'));
+
+    // Setup chart
+    $chart->add_series($sadnessseries);
+    $chart->add_series($joyseries);
+    $chart->add_series($fearseries);
+    $chart->add_series($disgustseries);
+    $chart->add_series($angerseries);
+
+    $chart->set_labels($labels);
+    $chart->set_title(get_string('chart_forum_sentiment_title', 'tool_sentiment_forum'));
     $chart->set_yaxis($yaxis);
 
     return $chart;

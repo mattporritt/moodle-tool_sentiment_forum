@@ -195,9 +195,20 @@ class watson_api {
         ];
 
         $response = $this->call_api($url, $params);
+        $sentiment = 0;
+        $emotion = array(
+                'sadness' => 0,
+                'joy' => 0,
+                'fear' => 0,
+                'anger' => 0,
+                'disgust' => 0,
+        );
 
-        $sentiment = $response['sentiment']['document']['score'];
-        $emotion = $response['emotion']['document']['emotion'];
+        if (isset($response['sentiment']['document']['score'])
+                && isset($response['emotion']['document']['emotion'])){
+            $sentiment = $response['sentiment']['document']['score'];
+            $emotion = $response['emotion']['document']['emotion'];
+        }
 
         return array($sentiment, $emotion);
     }

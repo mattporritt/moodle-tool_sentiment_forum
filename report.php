@@ -69,6 +69,10 @@ foreach ($forums as $forum) {
     $chartforumemotions  = get_chart_forum_emotions($forum->forumid);
     $tab->forum_emotions= $OUTPUT->render($chartforumemotions);
 
+    // Get forum emotion trend.
+    $chartforumemotiontrend  = get_chart_forum_emotion_trend($forum->forumid);
+    $tab->forum_emotion_trend= $OUTPUT->render($chartforumemotiontrend);
+
     $tabs->tabs[] = $tab;
     $count++;
 }

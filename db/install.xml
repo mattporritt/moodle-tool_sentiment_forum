@@ -35,7 +35,7 @@
         <FIELD NAME="fear" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
         <FIELD NAME="disgust" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
         <FIELD NAME="anger" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timeposted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

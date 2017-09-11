@@ -55,10 +55,13 @@
 </ul>
 <div class="tab-content m-t-1">
     {{#tabs}}
-        <div class="tab-pane {{#active}}active{{/active}}" id="{{name}}" role="tabpanel">
-            <div class="tab-forum-sentiment">{{{forum_sentiment}}}</div>
-            <div class="tab-forum-sentiment">{{{forum_emotions}}}</div>
+        <div class="tab-pane {{#active}}active{{/active}}" id="{{name}}" role="tabpanel" >
+        <div style="display:flex;flex-wrap:wrap;">
+            <div class="tab-forum-sentiment" style="width:100%;">{{{forum_emotion_trend}}}</div>
+            <div class="tab-forum-sentiment" style="width:50%;">{{{forum_sentiment}}}</div>
+            <div class="tab-forum-sentiment" style="width:50%;">{{{forum_emotions}}}</div>
         </div>
+     </div>
     {{/tabs}}
 </div>
 
