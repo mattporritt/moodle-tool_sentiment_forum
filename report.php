@@ -23,6 +23,7 @@
  */
 
 require_once(__DIR__ . '/../../../config.php');
+require_once(__DIR__.'/lib.php');
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -40,27 +41,34 @@ $PAGE->set_heading(get_string('pluginname', 'tool_sentiment_forum'));
 
 require_login();
 
+// Get enabled forums for this report.
 $analyzer = new analyze();
 $forums = $analyzer->get_enabled_forums($courseid);
+
 $tabs = new \stdClass();
 $tabs->tabs = array();
 $count = 1;
 
+// Construct tab content for each forum.
 foreach ($forums as $forum) {
     $tab = new \stdClass();
     $tab->name = 'forum_tab_' . $count;
     $tab->displayname = $forum->name;
+
     if ($count == 1){
         $tab->active = 1;
     } else {
         $tab->active = 0;
     }
-    $tab->html = "content 1";
+
+    $chartforumsentiment  = get_chart_forum_sentiment($forum->forumid);
+    $tab->forum_sentiment= $OUTPUT->render($chartforumsentiment);
 
     $tabs->tabs[] = $tab;
     $count++;
 }
 
+// Output the whole shebang.
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('tool_sentiment_forum/tabs', $tabs);
 echo $OUTPUT->footer();

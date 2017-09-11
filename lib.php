@@ -24,6 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use tool_sentiment_forum\analyze\analyze;
+
 /**
  * Inject the sentiment analysis elements into all moodle forum settings forms.
  *
@@ -140,4 +142,40 @@ function sentiment_forum_upsert($record) {
         $record->id = $id;
         $DB->update_record('sentiment_forum', $record);
     }
+}
+
+/**
+ * Given a Forum ID, construct a bar chart
+ * to display overall forum sentiment
+ *
+ * @param int $forumid Forum ID
+ * @return \core\chart_bar $chart The constructed chart object.
+ */
+function get_chart_forum_sentiment($forumid) {
+    $analyzer = new analyze();
+    $sentiment = $analyzer->get_forum_sentiment($forumid);
+
+    $chart = new \core\chart_bar(); //get a bar chart instance
+
+    // Setup chart series and labels
+    $series = new core\chart_series(
+            get_string('chart_forum_sentimentpercentage', 'tool_sentiment_forum'),
+            [$sentiment]
+            );
+    $labels = ['sentiment'];
+
+    // Customise Y axis.
+    $yaxis = new \core\chart_axis();
+    $yaxis->set_min(-100);
+    $yaxis->set_max(100);
+    $yaxis->set_label(get_string('chart_forum_sentimentpercentage', 'tool_sentiment_forum'));
+
+    // Setup chart
+    $chart->add_series($series);
+    $chart->set_labels($labels);
+    $chart->set_title(get_string('chart_forum_title', 'tool_sentiment_forum'));
+    $chart->set_yaxis($yaxis);
+
+    return $chart;
+
 }

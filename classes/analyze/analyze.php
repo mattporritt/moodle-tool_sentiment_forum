@@ -77,6 +77,30 @@ class analyze {
     }
 
     /**
+     * Given a forum ID return the overall forum
+     * sentiment as a percentage.
+     *
+     * @param int $forumid Forum ID number.
+     * @return number $sentiment Sentiment as a percentage.
+     */
+    public function get_forum_sentiment($forumid) {
+        global $DB;
+
+        $rawsentiment = $DB->get_field('sentiment_forum', 'sentiment', array('forumid' => $forumid));
+        $sentiment = $rawsentiment * 100;
+
+        return $sentiment;
+    }
+
+    public function get_forum_emotion($forumid) {
+
+    }
+
+    public function get_forum_emotion_trend($forumid) {
+
+    }
+
+    /**
      * Given a forum ID get a list of the posts
      * that require sentiment analysis.
      *
