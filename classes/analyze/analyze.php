@@ -92,8 +92,26 @@ class analyze {
         return $sentiment;
     }
 
-    public function get_forum_emotion($forumid) {
+    /**
+     * Given a forum ID return the overall forum
+     * emtotions as a percentages.
+     *
+     * @param int $forumid Forum ID number.
+     * @return array $emotions Emotions as percentages.
+     */
+    public function get_forum_emotions($forumid) {
+        global $DB;
 
+        $emotionsrecord = $DB->get_record('sentiment_forum', array('forumid' => $forumid));
+        $emotions = array(
+                'sadness' => ($emotionsrecord->sadness * 100),
+                'joy' => ($emotionsrecord->joy * 100),
+                'fear' => ($emotionsrecord->fear * 100),
+                'disgust' => ($emotionsrecord->disgust * 100),
+                'anger' => ($emotionsrecord->anger * 100),
+        );
+
+        return $emotions;
     }
 
     public function get_forum_emotion_trend($forumid) {

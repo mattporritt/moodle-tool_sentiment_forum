@@ -146,7 +146,7 @@ function sentiment_forum_upsert($record) {
 
 /**
  * Given a Forum ID, construct a bar chart
- * to display overall forum sentiment
+ * to display overall forum sentiment.
  *
  * @param int $forumid Forum ID
  * @return \core\chart_bar $chart The constructed chart object.
@@ -173,7 +173,50 @@ function get_chart_forum_sentiment($forumid) {
     // Setup chart
     $chart->add_series($series);
     $chart->set_labels($labels);
-    $chart->set_title(get_string('chart_forum_title', 'tool_sentiment_forum'));
+    $chart->set_title(get_string('chart_forum_sentiment_title', 'tool_sentiment_forum'));
+    $chart->set_yaxis($yaxis);
+
+    return $chart;
+
+}
+
+/**
+ * Given a Forum ID, construct a bar chart
+ * to display overall forum emotions.
+ *
+ * @param int $forumid Forum ID
+ * @return \core\chart_bar $chart The constructed chart object.
+ */
+function get_chart_forum_emotions($forumid) {
+    $analyzer = new analyze();
+    $emotions = $analyzer->get_forum_emotions($forumid);
+    $seriesarray = array();
+    $labelsarray = array();
+
+    foreach ($emotions as $key => $value) {
+        $seriesarray[] = $value;
+        $labelsarray[] = $key;
+    }
+
+    $chart = new \core\chart_bar(); //get a bar chart instance
+
+    // Setup chart series and labels
+    $series = new core\chart_series(
+            get_string('chart_forum_emotionpercentage', 'tool_sentiment_forum'),
+            $seriesarray
+            );
+    $labels = $labelsarray;
+
+    // Customise Y axis.
+    $yaxis = new \core\chart_axis();
+    $yaxis->set_min(0);
+    $yaxis->set_max(100);
+    $yaxis->set_label(get_string('chart_forum_emotionpercentage', 'tool_sentiment_forum'));
+
+    // Setup chart
+    $chart->add_series($series);
+    $chart->set_labels($labels);
+    $chart->set_title(get_string('chart_forum_emotion_title', 'tool_sentiment_forum'));
     $chart->set_yaxis($yaxis);
 
     return $chart;
