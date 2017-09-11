@@ -106,7 +106,9 @@ function tool_sentiment_forum_extend_navigation_course($navigation, $course, $co
     // Only show this report if there are sentiment enabled forums in this course.
     // TODO: this
 
-    $url = new moodle_url('/admin/tool/sentiment_forum/report.php', array('contextid' => $context->id));
+    $url = new moodle_url('/admin/tool/sentiment_forum/report.php',
+            array('contextid' => $context->id, 'courseid' => $course->id)
+            );
     $pluginname = get_string('pluginname', 'tool_sentiment_forum');
 
     // TODO: add capability check.

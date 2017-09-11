@@ -50,12 +50,28 @@ class analyze {
     /**
      * Get all forums that have sentiment analysis enabled.
      *
+     * @param int|bool $courseid If supplied limit to this course ID.
      * @return array $forums list of enabled forums
      */
-    public function get_enabled_forums() {
+    public function get_enabled_forums($courseid=false) {
         global $DB;
 
-        $forums = $DB->get_records('sentiment_forum', array('enabled'=>'1'));
+        if ($courseid) {
+            $course = 'AND f.course = ?';
+            $params = array('1', $courseid);
+        } else {
+            $course = '';
+            $params = array('1');
+        }
+
+        $forums = $DB->get_records_sql(
+                'SELECT sf.*, f.course, f.type, f.name
+                FROM {sentiment_forum} sf
+                LEFT JOIN {forum} f
+                on sf.forumid = f.id
+                WHERE sf.enabled = ? ' . $course,
+                $params
+                );
 
         return $forums;
     }

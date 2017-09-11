@@ -24,8 +24,14 @@
 
 require_once(__DIR__ . '/../../../config.php');
 
+defined('MOODLE_INTERNAL') || die();
+
+use tool_sentiment_forum\analyze\analyze;
+
 $contextid = required_param('contextid', PARAM_INT);
+$courseid = required_param('courseid', PARAM_INT);
 $context = context::instance_by_id($contextid, MUST_EXIST);
+
 
 $PAGE->set_context($context);
 $PAGE->set_url('/admin/tool/sentiment_forum/report.php', array('contextid' => $context->id));
@@ -34,28 +40,26 @@ $PAGE->set_heading(get_string('pluginname', 'tool_sentiment_forum'));
 
 require_login();
 
+$analyzer = new analyze();
+$forums = $analyzer->get_enabled_forums($courseid);
 $tabs = new \stdClass();
-$tab1 = new \stdClass();
-$tab1->name = 'tab1';
-$tab1->displayname = 'Tab 1';
-$tab1->active = 1;
-$tab1->html = "content 1";
+$tabs->tabs = array();
+$count = 1;
 
-$tab2 = new \stdClass();
-$tab2->name = 'tab2';
-$tab2->displayname = 'Tab 2';
-$tab2->active = 0;
-$tab2->html = "content 2";
+foreach ($forums as $forum) {
+    $tab = new \stdClass();
+    $tab->name = 'forum_tab_' . $count;
+    $tab->displayname = $forum->name;
+    if ($count == 1){
+        $tab->active = 1;
+    } else {
+        $tab->active = 0;
+    }
+    $tab->html = "content 1";
 
-$tab3 = new \stdClass();
-$tab3->name = 'tab3';
-$tab3->displayname = 'Tab 3';
-$tab3->active = 0;
-$tab3->html = "content 3";
-
-
-$tabs->tabs = array($tab1, $tab2, $tab3);
-
+    $tabs->tabs[] = $tab;
+    $count++;
+}
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('tool_sentiment_forum/tabs', $tabs);
