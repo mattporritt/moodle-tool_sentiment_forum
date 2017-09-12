@@ -35,7 +35,9 @@ $context = context::instance_by_id($contextid, MUST_EXIST);
 
 
 $PAGE->set_context($context);
-$PAGE->set_url('/admin/tool/sentiment_forum/report.php', array('contextid' => $context->id));
+$PAGE->set_url('/admin/tool/sentiment_forum/report.php',
+        array('contextid' => $context->id, 'courseid' => $courseid)
+        );
 $PAGE->set_title(get_string('pluginname', 'tool_sentiment_forum'));
 $PAGE->set_heading(get_string('pluginname', 'tool_sentiment_forum'));
 
