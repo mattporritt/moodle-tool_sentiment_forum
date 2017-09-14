@@ -74,7 +74,7 @@ function tool_sentiment_forum_coursemodule_edit_post_actions($data, $course) {
         // save sentiment analysis in DB
         $record = new \stdClass();
         $record->forumid = $data->instance;
-        $record->enabled = $data->sentimentenabled;
+        $record->enabled = isset($data->sentimentenabled) ? $data->sentimentenabled : 0;
         $record->timemodified = time();
 
         sentiment_forum_upsert($record);
