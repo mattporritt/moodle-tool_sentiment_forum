@@ -89,3 +89,71 @@ This will return a response in the form of:
 
 
 ## Get Sentiment, Emotion, Keywords and Concepts ##
+
+The following example will get sentiment, emotion, keywords and concepts of the submitted piece of text: `This service is fantastic. I like programming a lot`
+
+**NOTE:** Replace the `token` variable in the example (including removing the braces) with an actual generated token.
+
+<pre><code>
+curl -X POST \
+-H "Content-Type: application/json" \
+-H "Accept: application/json" \
+-H "X-Watson-Authorization-Token: {token}" \
+-d '{
+  "text": "This service is fantastic. I like programming a lot",
+  "features": {
+      "emotion": {},
+      "sentiment":{},
+      "concepts":{
+          "limit": 8
+      },
+      "keywords":{
+          "limit": 8
+      }
+    }
+}' \
+"https://gateway.watsonplatform.net/natural-language-understanding/api/v1/analyze?version=2017-02-27"
+</code></pre>
+
+This will return a response in the form of:
+
+<pre><code>
+{
+  "usage": {
+    "text_units": 1,
+    "text_characters": 51,
+    "features": 4
+  },
+  "sentiment": {
+    "document": {
+      "score": 0.900637,
+      "label": "positive"
+    }
+  },
+  "language": "en",
+  "keywords": [
+    {
+      "text": "service",
+      "relevance": 0.912916
+    }
+  ],
+  "emotion": {
+    "document": {
+      "emotion": {
+        "sadness": 0.064248,
+        "joy": 0.846788,
+        "fear": 0.005968,
+        "disgust": 0.014673,
+        "anger": 0.021793
+      }
+    }
+  },
+  "concepts": [
+    {
+      "text": "Computer",
+      "relevance": 0.853366,
+      "dbpedia_resource": "http://dbpedia.org/resource/Computer"
+    }
+  ]
+}
+</code></pre>
