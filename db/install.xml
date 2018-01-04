@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="sentiment_forum" COMMENT="Forum Table">
+    <TABLE NAME="tool_sentiment_forum" COMMENT="Forum Table">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" UNIQUE="true" COMMENT="primary id for core forum table"/>
@@ -24,7 +24,7 @@
         <INDEX NAME="forumid" UNIQUE="true" FIELDS="forumid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="sentiment_forum_posts" COMMENT="Forum Posts Table">
+    <TABLE NAME="tool_sentiment_forum_posts" COMMENT="Forum Posts Table">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" UNIQUE="false" COMMENT="primary id for core forum table"/>

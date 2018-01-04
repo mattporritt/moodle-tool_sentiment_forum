@@ -59,5 +59,15 @@ if ($hassiteconfig) {
                 get_string('apiendpoint_desc', 'tool_sentiment_forum'),
                 'https://gateway.watsonplatform.net/natural-language-understanding/api', PARAM_URL));
 
+        $settings->add(new admin_setting_configtext('tool_sentiment_forum/tikasendsize',
+                get_string('tikasendsize', 'search_elastic' ),
+                get_string('tikasendsize_desc', 'search_elastic'),
+                10, PARAM_INT, 2));
+
+        $settings->add(new admin_setting_configtext('tool_sentiment_forum/tikasendsize',
+                get_string('tikasendsize', 'tool_sentiment_forum' ),
+                get_string('tikasendsize_desc', 'tool_sentiment_forum'),
+                10, PARAM_INT, 2));
+
     }
 }

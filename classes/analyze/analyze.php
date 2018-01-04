@@ -66,7 +66,7 @@ class analyze {
 
         $forums = $DB->get_records_sql(
                 'SELECT sf.*, f.course, f.type, f.name
-                FROM {sentiment_forum} sf
+                FROM {tool_sentiment_forum} sf
                 LEFT JOIN {forum} f
                 on sf.forumid = f.id
                 WHERE sf.enabled = ? ' . $course,
@@ -86,7 +86,7 @@ class analyze {
     public function get_forum_sentiment($forumid) {
         global $DB;
 
-        $rawsentiment = $DB->get_field('sentiment_forum', 'sentiment', array('forumid' => $forumid));
+        $rawsentiment = $DB->get_field('tool_sentiment_forum', 'sentiment', array('forumid' => $forumid));
         $sentiment = $rawsentiment * 100;
 
         return $sentiment;
@@ -102,7 +102,7 @@ class analyze {
     public function get_forum_emotions($forumid) {
         global $DB;
 
-        $emotionsrecord = $DB->get_record('sentiment_forum', array('forumid' => $forumid));
+        $emotionsrecord = $DB->get_record('tool_sentiment_forum', array('forumid' => $forumid));
         $emotions = array(
                 'sadness' => ($emotionsrecord->sadness * 100),
                 'joy' => ($emotionsrecord->joy * 100),
@@ -124,7 +124,7 @@ class analyze {
         global $DB;
 
         $emotionrecords = $DB->get_records_select(
-                'sentiment_forum_posts',
+                'tool_sentiment_forum_posts',
                 'sadness <> 0 AND joy <> 0 AND fear <> 0 AND disgust <> 0 AND anger <> 0 AND forumid = :forumid',
                 array('forumid' => $forumid),
                 'timeposted ASC'
@@ -180,7 +180,7 @@ class analyze {
         $record->disgust = $emotion['disgust'];
         $record->timeposted = $post->created;
 
-        $result = $DB->insert_record('sentiment_forum_posts', $record);
+        $result = $DB->insert_record('tool_sentiment_forum_posts', $record);
 
         return $result;
     }
@@ -211,7 +211,7 @@ class analyze {
         // Get 1000 rows of data from the log table order by oldest first.
         // Keep getting records 1000 at a time until we run out of records or max execution time is reached.
         while (true) {
-            $results = $DB->get_records('sentiment_forum_posts', array('forumid' => $forumid), '', '*', $start, $limit);
+            $results = $DB->get_records('tool_sentiment_forum_posts', array('forumid' => $forumid), '', '*', $start, $limit);
 
             if (empty($results)) {
                 break; // Stop trying to get records when we run out.
@@ -241,7 +241,7 @@ class analyze {
             $avganger = $totalanger / $count;
             $avgdisgust = $totaldisgust / $count;
 
-            $tableid = $DB->get_field('sentiment_forum', 'id', array('forumid' => $forumid));
+            $tableid = $DB->get_field('tool_sentiment_forum', 'id', array('forumid' => $forumid));
             $record = new \stdClass();
             $record->id = $tableid;
             $record->sentiment = $avgsenitment;
@@ -252,7 +252,7 @@ class analyze {
             $record->disgust = $avgdisgust;
             $record->timemodified = time();
 
-            $forum = $DB->update_record('sentiment_forum', $record);
+            $forum = $DB->update_record('tool_sentiment_forum', $record);
         }
 
         return $forum;

@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'tool_sentiment_forum';
-$plugin->release = '2017091105';
-$plugin->version = 2017091105;
+$plugin->release = '2018010400';
+$plugin->version = 2018010400;
 $plugin->requires = 2017051500;
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->dependencies = array(

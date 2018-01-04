@@ -41,7 +41,7 @@ function tool_sentiment_forum_coursemodule_standard_elements($formwrapper, $mfor
         $forumid = $formwrapper->get_current()->id;
 
         if ($forumid != '') {
-            $enabled = $DB->get_field('sentiment_forum', 'enabled', array ('forumid' => $forumid));
+            $enabled = $DB->get_field('tool_sentiment_forum', 'enabled', array ('forumid' => $forumid));
         } else {
             $enabled = 0;
         }
@@ -134,16 +134,16 @@ function sentiment_forum_upsert($record) {
 
     // Try insert.
     try {
-        $DB->insert_record('sentiment_forum', $record, false);
+        $DB->insert_record('tool_sentiment_forum', $record, false);
     } catch (Exception $e) {
         $insert = false;
     }
 
     // Insert failed try update.
     if (!$insert) {
-        $id = $DB->get_field('sentiment_forum', 'id', array ('forumid' => $record->forumid));
+        $id = $DB->get_field('tool_sentiment_forum', 'id', array ('forumid' => $record->forumid));
         $record->id = $id;
-        $DB->update_record('sentiment_forum', $record);
+        $DB->update_record('tool_sentiment_forum', $record);
     }
 }
 
