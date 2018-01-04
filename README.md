@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/mattporritt/moodle-tool_sentiment_forum.svg?branch=master)](https://travis-ci.org/mattporritt/moodle-tool_sentiment_forum)
 # Forum Sentiment Analysis #
 
 TODO Describe the plugin shortly here.
