@@ -18,7 +18,6 @@
  * Unit tests.
  *
  * @package     tool_sentiment_forum
- * @category    phpunit
  * @copyright   2018 Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,6 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 
 use tool_sentiment_forum\analyze\analyze;
 
+/**
+ * Unit tests.
+ *
+ * @package     tool_sentiment_forum
+ * @copyright   2018 Matt Porritt <mattp@catalyst-au.net>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
 
     /**
@@ -40,17 +46,17 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         // Create a course.
         $course1 = $generator->create_course();
 
-        // Create some forums and enable sentiment analysis in only one forum
+        // Create some forums and enable sentiment analysis in only one forum.
         $forum1 = $generator->create_module('forum', array('course' => $course1->id));
         $forum2 = $generator->create_module('forum', array('course' => $course1->id, 'sentimentenabled' => 1));
 
         // Get enabled forums and check results.
         $analyzer = new analyze();
         $forums = $analyzer->get_enabled_forums();
-        $forum_result = reset($forums);
+        $forumresult = reset($forums);
 
         $this->assertEquals(1, count($forums));
-        $this->assertEquals($forum2->id, $forum_result->forumid);
+        $this->assertEquals($forum2->id, $forumresult->forumid);
 
     }
 
@@ -73,10 +79,10 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         // Get enabled forums and check results.
         $analyzer = new analyze();
         $forums = $analyzer->get_enabled_forums($course1->id);
-        $forum_result = reset($forums);
+        $forumresult = reset($forums);
 
         $this->assertEquals(1, count($forums));
-        $this->assertEquals($forum1->id, $forum_result->forumid);
+        $this->assertEquals($forum1->id, $forumresult->forumid);
 
     }
 }

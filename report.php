@@ -57,7 +57,7 @@ foreach ($forums as $forum) {
     $tab->name = 'forum_tab_' . $count;
     $tab->displayname = $forum->name;
 
-    if ($count == 1){
+    if ($count == 1) {
         $tab->active = 1;
     } else {
         $tab->active = 0;
@@ -65,15 +65,15 @@ foreach ($forums as $forum) {
 
     // Get overall forum sentiment.
     $chartforumsentiment  = get_chart_forum_sentiment($forum->forumid);
-    $tab->forum_sentiment= $OUTPUT->render($chartforumsentiment);
+    $tab->forum_sentiment = $OUTPUT->render($chartforumsentiment);
 
     // Get overall forum emotions.
     $chartforumemotions  = get_chart_forum_emotions($forum->forumid);
-    $tab->forum_emotions= $OUTPUT->render($chartforumemotions);
+    $tab->forum_emotions = $OUTPUT->render($chartforumemotions);
 
     // Get forum emotion trend.
     $chartforumemotiontrend  = get_chart_forum_emotion_trend($forum->forumid);
-    $tab->forum_emotion_trend= $OUTPUT->render($chartforumemotiontrend);
+    $tab->forum_emotion_trend = $OUTPUT->render($chartforumemotiontrend);
 
     $tabs->tabs[] = $tab;
     $count++;

@@ -45,17 +45,17 @@ if ($hassiteconfig) {
                 get_string('username_desc', 'tool_sentiment_forum'),
                 '', PARAM_TEXT));
 
-       $settings->add(new admin_setting_configpasswordunmask('tool_sentiment_forum/password',
+        $settings->add(new admin_setting_configpasswordunmask('tool_sentiment_forum/password',
                 get_string('password', 'tool_sentiment_forum' ),
                 get_string('password_desc', 'tool_sentiment_forum'),
                 ''));
 
-       $settings->add(new admin_setting_configtext('tool_sentiment_forum/tokenendpoint',
+        $settings->add(new admin_setting_configtext('tool_sentiment_forum/tokenendpoint',
                 get_string('tokenendpoint',      'tool_sentiment_forum'),
                 get_string('tokenendpoint_desc', 'tool_sentiment_forum'),
                'https://gateway.watsonplatform.net/authorization/api/v1/token', PARAM_URL));
 
-       $settings->add(new admin_setting_configtext('tool_sentiment_forum/apiendpoint',
+        $settings->add(new admin_setting_configtext('tool_sentiment_forum/apiendpoint',
                 get_string('apiendpoint',      'tool_sentiment_forum'),
                 get_string('apiendpoint_desc', 'tool_sentiment_forum'),
                 'https://gateway.watsonplatform.net/natural-language-understanding/api', PARAM_URL));

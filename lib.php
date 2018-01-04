@@ -37,7 +37,7 @@ function tool_sentiment_forum_coursemodule_standard_elements($formwrapper, $mfor
     $module = $formwrapper->get_current()->modulename;
 
     if ($module == 'forum') { // Only apply sentiment settings to forums.
-        // Get existing config
+        // Get existing config.
         $forumid = $formwrapper->get_current()->id;
 
         if ($forumid != '') {
@@ -59,8 +59,6 @@ function tool_sentiment_forum_coursemodule_standard_elements($formwrapper, $mfor
 
 }
 
-
-
 /**
  * Hook the add/edit of the course module.
  *
@@ -71,7 +69,7 @@ function tool_sentiment_forum_coursemodule_edit_post_actions($data, $course) {
     $module = $data->modulename;
 
     if ($module == 'forum') { // Only apply sentiment settings to forums.
-        // save sentiment analysis in DB
+        // save sentiment analysis in DB.
         $record = new \stdClass();
         $record->forumid = $data->instance;
         $record->enabled = isset($data->sentimentenabled) ? $data->sentimentenabled : 0;
@@ -79,14 +77,19 @@ function tool_sentiment_forum_coursemodule_edit_post_actions($data, $course) {
 
         sentiment_forum_upsert($record);
 
-
     }
 
     return $data;
 }
 
+/**
+ * Hook the delete action of the course module.
+ *
+ * @param stdClass $cm
+ * @return void
+ */
 function tool_sentiment_forum_pre_course_module_delete(stdClass $cm) {
- // TODO: Handle module deletion;
+    // TODO: Handle module deletion.
 }
 
 /**
@@ -106,7 +109,7 @@ function tool_sentiment_forum_extend_navigation_course($navigation, $course, $co
     }
 
     // Only show this report if there are sentiment enabled forums in this course.
-    // TODO: this
+    // TODO: this.
 
     $url = new moodle_url('/admin/tool/sentiment_forum/report.php',
             array('contextid' => $context->id, 'courseid' => $course->id)
@@ -155,9 +158,9 @@ function get_chart_forum_sentiment($forumid) {
     $analyzer = new analyze();
     $sentiment = $analyzer->get_forum_sentiment($forumid);
 
-    $chart = new \core\chart_bar(); //get a bar chart instance
+    $chart = new \core\chart_bar(); // Get a bar chart instance.
 
-    // Setup chart series and labels
+    // Setup chart series and labels.
     $series = new core\chart_series(
             get_string('chart_forum_sentimentrating', 'tool_sentiment_forum'),
             [$sentiment]
@@ -170,7 +173,7 @@ function get_chart_forum_sentiment($forumid) {
     $yaxis->set_max(100);
     $yaxis->set_label(get_string('chart_forum_sentimentrating', 'tool_sentiment_forum'));
 
-    // Setup chart
+    // Setup chart.
     $chart->add_series($series);
     $chart->set_labels($labels);
     $chart->set_title(get_string('chart_forum_sentiment_title', 'tool_sentiment_forum'));
@@ -198,9 +201,9 @@ function get_chart_forum_emotions($forumid) {
         $labelsarray[] = $key;
     }
 
-    $chart = new \core\chart_bar(); //get a bar chart instance
+    $chart = new \core\chart_bar(); // Get a bar chart instance.
 
-    // Setup chart series and labels
+    // Setup chart series and labels.
     $series = new core\chart_series(
             get_string('chart_forum_emotionrating', 'tool_sentiment_forum'),
             $seriesarray
@@ -213,7 +216,7 @@ function get_chart_forum_emotions($forumid) {
     $yaxis->set_max(100);
     $yaxis->set_label(get_string('chart_forum_emotionrating', 'tool_sentiment_forum'));
 
-    // Setup chart
+    // Setup chart.
     $chart->add_series($series);
     $chart->set_labels($labels);
     $chart->set_title(get_string('chart_forum_emotion_title', 'tool_sentiment_forum'));
@@ -239,21 +242,21 @@ function get_chart_forum_emotion_trend($forumid) {
     $chart = new \core\chart_line();
     $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
-    // Split returned records up into weeks
+    // Split returned records up into weeks.
     $weektime = 0;
-    $weekrecords= array();
+    $weekrecords = array();
     $avgarray = array();
     foreach ($emotionrecords as $record) {
-        if($record->timeposted > $weektime){
+        if ($record->timeposted > $weektime) {
             $weektime = $record->timeposted + 604800;
-            $weekarray= array();
+            $weekarray = array();
         }
         $weekarray[] = $record;
         $weekrecords[$weektime] = $weekarray;
 
     }
 
-    // Average weekly record groups
+    // Average weekly record groups.
     $weekavg = array();
     foreach ($weekrecords as $time => $week) {
 
@@ -265,11 +268,11 @@ function get_chart_forum_emotion_trend($forumid) {
         $angertotal = 0;
 
         foreach ($week as $record) {
-            $sadnesstotal+= $record->sadness;
-            $joytotal+= $record->joy;
-            $feartotal+= $record->fear;
-            $disgusttotal+= $record->disgust;
-            $angertotal+= $record->anger;
+            $sadnesstotal += $record->sadness;
+            $joytotal += $record->joy;
+            $feartotal += $record->fear;
+            $disgusttotal += $record->disgust;
+            $angertotal += $record->anger;
         }
 
         $recordavg = new \stdClass();
@@ -296,10 +299,10 @@ function get_chart_forum_emotion_trend($forumid) {
         $fear[] = $record->fearavg;
         $disgust[] = $record->disgustavg;
         $anger[] = $record->angeravg;
-        $timeposted[] = userdate($timestamp- DAYSECS, get_string('strftimedate'), $CFG->timezone);
+        $timeposted[] = userdate($timestamp - DAYSECS, get_string('strftimedate'), $CFG->timezone);
     }
 
-    // Setup chart series and labels
+    // Setup chart series and labels.
     $sadnessseries = new core\chart_series(
             get_string('chart_forum_emotionsadness', 'tool_sentiment_forum'),
             $sadness
@@ -329,7 +332,7 @@ function get_chart_forum_emotion_trend($forumid) {
     $yaxis->set_max(100);
     $yaxis->set_label(get_string('chart_forum_sentimentrating', 'tool_sentiment_forum'));
 
-    // Setup chart
+    // Setup chart.
     $chart->add_series($sadnessseries);
     $chart->add_series($joyseries);
     $chart->add_series($fearseries);

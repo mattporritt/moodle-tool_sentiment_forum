@@ -114,6 +114,12 @@ class analyze {
         return $emotions;
     }
 
+    /**
+     * Get emotional trend for forum.
+     *
+     * @param int $forumid Moodle forum ID.
+     * @return array $emotionrecords Records retrieved from database.
+     */
     public function get_forum_emotion_trend($forumid) {
         global $DB;
 
@@ -204,11 +210,11 @@ class analyze {
 
         // Get 1000 rows of data from the log table order by oldest first.
         // Keep getting records 1000 at a time until we run out of records or max execution time is reached.
-        while (true){
+        while (true) {
             $results = $DB->get_records('sentiment_forum_posts', array('forumid' => $forumid), '', '*', $start, $limit);
 
             if (empty($results)) {
-                break; // Stop trying to get records when we run out;
+                break; // Stop trying to get records when we run out.
             }
 
             // Increment record start position for next iteration.
@@ -258,7 +264,7 @@ class analyze {
      *
      * @param int $forumid the forum to analyze.
      */
-    public function analyze_forum($forumid){
+    public function analyze_forum($forumid) {
         $posts = $this->get_unanalyzed_posts($forumid);
         $watson = new watson_api();
 

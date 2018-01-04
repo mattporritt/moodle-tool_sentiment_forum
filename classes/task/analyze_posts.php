@@ -66,7 +66,5 @@ class analyze_posts extends \core\task\scheduled_task {
 
         }
 
-
-
     }
 }

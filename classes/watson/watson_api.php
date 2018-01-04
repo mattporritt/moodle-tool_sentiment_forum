@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
 
 /**
-* Watson API interface for sentiment fourum tool.
+ * Watson API interface for sentiment fourum tool.
  *
  * @package     tool_sentiment_forum
  * @copyright   2017 Matt Porritt <mattp@catalyst-au.net>
@@ -42,13 +42,14 @@ class watson_api {
      * Makes relevant configuration from config available and
      * creates Guzzle client.
      *
-     * @param \stdClass $moduleinstance Activity instance.
+     * @param \GuzzleHttp\HandlerStack $handler Optional custom Guzzle handler stack
+     * @return void
      */
     public function __construct($handler = false) {
         $this->config = get_config('tool_sentiment_forum');
         $this->username = $this->config->username;
         $this->password = $this->config->password;
-        $this->tokenendpoint= $this->config->tokenendpoint;
+        $this->tokenendpoint = $this->config->tokenendpoint;
         $this->apiendpoint = $this->config->apiendpoint;
         $this->token = '';
 
@@ -139,21 +140,20 @@ class watson_api {
     /**
      * Calls the Watson API.
      *
-     * @param string $url Watson service endpoint to call
+     * @param string $url Watson service endpoint to call.
+     * @param array $params Array of params to send with request.
      * @param bool $retry
-     * @return object $responseobj The response recevied from the API
+     * @return object $responseobj The response recevied from the API.
      */
     public function call_api($url, $params, $retry=true) {
-       // $url = 'https://requestb.in/wptm0swp';
-
         // Sort out token to be used in analysis calls.
         if ($this->token == '') {
             $this->token = $this->generate_token();
         }
 
-        $headers= ['Content-Type' => 'application/json',
-                                 'Accept' => 'application/json',
-                                 'X-Watson-Authorization-Token' => $this->token ];
+        $headers = ['Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                    'X-Watson-Authorization-Token' => $this->token ];
 
         $jsonparams = json_encode($params);
 
@@ -185,6 +185,12 @@ class watson_api {
         return $responseobj;
     }
 
+    /**
+     * Perform sentiment analysis on supplied text.
+     *
+     * @param string $text The text to perform sentiment analysis on.
+     * @return array $result Sentiment and emotion of analysed text.
+     */
     public function analyze_sentiment($text) {
         $url = $this->apiendpoint . '/v1/analyze?version=2017-02-27';
         $params = ['text' => $text,
@@ -205,12 +211,14 @@ class watson_api {
         );
 
         if (isset($response['sentiment']['document']['score'])
-                && isset($response['emotion']['document']['emotion'])){
+                && isset($response['emotion']['document']['emotion'])) {
             $sentiment = $response['sentiment']['document']['score'];
             $emotion = $response['emotion']['document']['emotion'];
         }
 
-        return array($sentiment, $emotion);
+        $result = array($sentiment, $emotion);
+
+        return $result;
     }
 
 }
