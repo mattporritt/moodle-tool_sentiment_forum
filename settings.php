@@ -60,8 +60,8 @@ if ($hassiteconfig) {
                 'https://gateway.watsonplatform.net/natural-language-understanding/api', PARAM_URL));
 
         $settings->add(new admin_setting_configtext('tool_sentiment_forum/maxkeywords',
-                get_string('maxkeywords', 'search_elastic' ),
-                get_string('maxkeywords_desc', 'search_elastic'),
+                get_string('maxkeywords', 'tool_sentiment_forum' ),
+                get_string('maxkeywords_desc', 'tool_sentiment_forum'),
                 10, PARAM_INT, 2));
 
         $settings->add(new admin_setting_configtext('tool_sentiment_forum/maxconcepts',
