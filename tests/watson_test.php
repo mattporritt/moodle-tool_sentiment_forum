@@ -136,4 +136,46 @@ class tool_sentiment_forum_watson_testcase extends advanced_testcase {
 
         $this->assertEquals($proxy, $expected, $canonicalize = true);
     }
+
+    /**
+     * Test call api functionality
+     */
+    public function test_call_api() {
+        $container = [];
+        $history = Middleware::history($container);
+
+        // Create a mock response and stack.
+        $mock = new MockHandler([
+                new Response(200, ['Content-Type' => 'application/json'],'{"properties":"value"}')
+        ]);
+
+        $stack = HandlerStack::create($mock);
+        $stack->push($history); // Add the history middleware to the handler stack.
+
+        $client = new tool_sentiment_forum\watson\watson_api($stack);
+        $client->token = '1234';
+
+        $url = 'http://localhost:8080/foo?bar=blerg';
+        $params = ['text' => 'the test text',
+                   'features' => [
+                        'emotion' => new \stdClass(),
+                        'sentiment' => new \stdClass()
+                  ]
+        ];
+
+        $response = $client->call_api($url, $params);
+        $request = $container[0]['request'];
+        $contentheader = $request->getHeader('content-type');
+
+        // Check the results.
+        $this->assertEquals($response['properties'], 'value');
+        $this->assertEquals($request->getUri()->getScheme(), 'http');
+        $this->assertEquals($request->getUri()->getHost(),  'localhost');
+        $this->assertEquals($request->getUri()->getPort(),  '8080');
+        $this->assertEquals($request->getUri()->getPath(), '/foo');
+        $this->assertEquals($request->getUri()->getQuery(), 'bar=blerg');
+        $this->assertTrue($request->hasHeader('content-type'));
+        $this->assertEquals($contentheader, array('application/json'));
+
+    }
 }
