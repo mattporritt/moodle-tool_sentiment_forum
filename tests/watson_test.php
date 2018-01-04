@@ -146,7 +146,7 @@ class tool_sentiment_forum_watson_testcase extends advanced_testcase {
 
         // Create a mock response and stack.
         $mock = new MockHandler([
-                new Response(200, ['Content-Type' => 'application/json'],'{"properties":"value"}')
+                new Response(200, ['Content-Type' => 'application/json'], '{"properties":"value"}')
         ]);
 
         $stack = HandlerStack::create($mock);
@@ -157,10 +157,10 @@ class tool_sentiment_forum_watson_testcase extends advanced_testcase {
 
         $url = 'http://localhost:8080/foo?bar=blerg';
         $params = ['text' => 'the test text',
-                   'features' => [
+                'features' => [
                         'emotion' => new \stdClass(),
                         'sentiment' => new \stdClass()
-                  ]
+                ]
         ];
 
         $response = $client->call_api($url, $params);
@@ -176,6 +176,22 @@ class tool_sentiment_forum_watson_testcase extends advanced_testcase {
         $this->assertEquals($request->getUri()->getQuery(), 'bar=blerg');
         $this->assertTrue($request->hasHeader('content-type'));
         $this->assertEquals($contentheader, array('application/json'));
+
+    }
+
+    /**
+     * Test analyze sentiment functionality, with an empty response.
+     */
+    public function test_analyze_sentiment_no_result() {
+        // Mock out call api to return a predictable value.
+        $builder = $this->getMockBuilder('tool_sentiment_forum\watson\watson_api');
+        $builder->setMethods(array('call_api'));
+        $stub = $builder->getMock();
+        $stub->method('call_api')->willReturn(array());
+
+        $response = $stub->analyze_sentiment('the test text');
+
+        error_log(print_r($response, true));
 
     }
 }
