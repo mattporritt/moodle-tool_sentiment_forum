@@ -1,0 +1,82 @@
+
+language: php
+
+notifications:
+  email:
+    recipients:
+    - mattp@catalyst-au.net
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+    - $HOME/.npm
+
+php:
+  - 5.6
+  - 7.0
+  - 7.1
+
+addons:
+  postgresql: "9.3"
+
+env:
+  - DB=pgsql MOODLE_BRANCH=MOODLE_33_STABLE
+  - DB=mysqli MOODLE_BRANCH=MOODLE_33_STABLE
+  - DB=pgsql MOODLE_BRANCH=MOODLE_34_STABLE
+  - DB=mysqli MOODLE_BRANCH=MOODLE_34_STABLE
+  - DB=pgsql MOODLE_BRANCH=master
+  - DB=mysqli MOODLE_BRANCH=master
+
+matrix:
+  exclude:
+    - php: 7.1
+      env: DB=pgsql MOODLE_BRANCH=MOODLE_31_STABLE
+    - php: 7.1
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_31_STABLE
+    - php: 5.6
+      env: DB=pgsql MOODLE_BRANCH=MOODLE_34_STABLE
+    - php: 5.6
+      env: DB=pgsql MOODLE_BRANCH=master
+    - php: 5.6
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_34_STABLE
+    - php: 5.6
+      env: DB=mysqli MOODLE_BRANCH=master
+
+before_install:
+  - export MOODLE_VERSION=$(echo "$MOODLE_BRANCH" | cut -d'_' -f 2)
+  - if [ "$MOODLE_VERSION" = "master" ] || [ "$MOODLE_VERSION" -ge 32 ]; then export CI=2; else export CI=1; fi
+  - echo $CI
+  - phpenv config-rm xdebug.ini
+  - cd ../..
+  - git clone --mirror 'https://github.com/moodlehq/moodle-behat-extension.git' '/home/travis/.composer/cache/vcs/git-github.com-moodlehq-moodle-behat-extension.git/' || true
+  - if [ "$CI" = 2 ]; then
+      nvm install 8.9;
+      nvm use 8.9;
+      composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2;
+    else
+      composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^1;
+    fi
+  - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+
+install:
+  - moodle-plugin-ci install -vvv
+
+script:
+  - moodle-plugin-ci validate
+  - moodle-plugin-ci phplint
+  - moodle-plugin-ci phpcpd
+#  - moodle-plugin-ci phpmd
+  - moodle-plugin-ci codechecker
+
+  - if [ "$CI" -eq 1 ]; then moodle-plugin-ci csslint    ; fi
+  - if [ "$CI" -eq 1 ]; then moodle-plugin-ci jshint     ; fi
+  - if [ "$CI" -eq 1 ]; then moodle-plugin-ci shifter    ; fi
+
+  - if [ "$CI" -eq 2 ]; then moodle-plugin-ci savepoints ; fi
+  - if [ "$CI" -eq 2 ]; then moodle-plugin-ci mustache   ; fi
+  - if [ "$CI" -eq 2 ]; then moodle-plugin-ci grunt      ; fi
+
+  - moodle-plugin-ci phpunit
+# - moodle-plugin-ci behat      # No tests yet
