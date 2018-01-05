@@ -193,10 +193,21 @@ class watson_api {
      */
     public function analyze_sentiment($text) {
         $url = $this->apiendpoint . '/v1/analyze?version=2017-02-27';
+        $emotion = new \stdClass();
+        $sentiment = new \stdClass();
+
+        $keywords = new \stdClass();
+        $keywords->limit = $this->config->maxkeywords;
+
+        $concepts = new \stdClass();
+        $concepts->limit = $this->config->maxconcepts;
+
         $params = ['text' => $text,
                    'features' => [
-                           'emotion' => new \stdClass(),
-                           'sentiment' => new \stdClass()
+                           'emotion' => $emotion,
+                           'sentiment' => $sentiment,
+                           'keywords' => $keywords,
+                           'concepts' => $concepts
                    ]
         ];
 
@@ -216,7 +227,10 @@ class watson_api {
             $emotion = $response['emotion']['document']['emotion'];
         }
 
-        $result = array($sentiment, $emotion);
+        $keywords = isset($response['keywords']) ? $response['keywords'] : array();
+        $concepts = isset($response['concepts']) ? $response['concepts'] : array();
+
+        $result = array($sentiment, $emotion, $keywords, $concepts);
 
         return $result;
     }

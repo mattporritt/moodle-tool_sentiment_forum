@@ -159,7 +159,7 @@ class tool_sentiment_forum_watson_testcase extends advanced_testcase {
         $params = ['text' => 'the test text',
                 'features' => [
                         'emotion' => new \stdClass(),
-                        'sentiment' => new \stdClass()
+                        'sentiment' => new \stdClass(),
                 ]
         ];
 
@@ -180,6 +180,63 @@ class tool_sentiment_forum_watson_testcase extends advanced_testcase {
     }
 
     /**
+     * Test analyze sentiment functionality.
+     */
+    public function test_analyze_sentiment() {
+        $callresponse = array (
+                'usage' => array (
+                        'text_units' => 1,
+                        'text_characters' => 26,
+                        'features' => 4
+                ),
+                'sentiment' => array (
+                        'document' => array (
+                                'score' => 0.900,
+                                'label' => 'positive'
+                        )
+                ),
+                'language' => 'en',
+                'keywords' => array (
+                        0 => array (
+                                'text' => 'service',
+                                'relevance' => 0.945
+                        )
+                ),
+                'emotion' => array (
+                        'document' => array (
+                                'emotion' => array (
+                                        'sadness' => 0.0195,
+                                        'joy' => 0.785,
+                                        'fear' => 0.000,
+                                        'disgust' => 0.012,
+                                        'anger' => 0.0164
+                                )
+                        )
+                ),
+                'concepts' => array (),
+        );
+
+        // Mock out call api to return a predictable value.
+        $builder = $this->getMockBuilder('tool_sentiment_forum\watson\watson_api');
+        $builder->setMethods(array('call_api'));
+        $stub = $builder->getMock();
+        $stub->method('call_api')->willReturn($callresponse);
+
+        $response = $stub->analyze_sentiment('the test text');
+        list($sentiment, $emotion, $keywords, $concepts) = $response;
+
+        $this->assertEquals($sentiment, 0.9);
+        $this->assertEquals($emotion['sadness'], 0.0195);
+        $this->assertEquals($emotion['joy'], 0.785);
+        $this->assertEquals($emotion['fear'], 0.000);
+        $this->assertEquals($emotion['disgust'], 0.012);
+        $this->assertEquals($emotion['anger'], 0.0164);
+        $this->assertEquals($keywords[0]['text'], 'service');
+        $this->assertEquals($concepts, array());
+
+    }
+
+    /**
      * Test analyze sentiment functionality, with an empty response.
      */
     public function test_analyze_sentiment_no_result() {
@@ -190,8 +247,16 @@ class tool_sentiment_forum_watson_testcase extends advanced_testcase {
         $stub->method('call_api')->willReturn(array());
 
         $response = $stub->analyze_sentiment('the test text');
+        list($sentiment, $emotion, $keywords, $concepts) = $response;
 
-        error_log(print_r($response, true));
+        $this->assertEquals($sentiment, 0);
+        $this->assertEquals($emotion['sadness'], 0);
+        $this->assertEquals($emotion['joy'], 0);
+        $this->assertEquals($emotion['fear'], 0);
+        $this->assertEquals($emotion['disgust'], 0);
+        $this->assertEquals($emotion['anger'], 0);
+        $this->assertEquals($keywords, array());
+        $this->assertEquals($concepts, array());
 
     }
 }
