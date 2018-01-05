@@ -225,6 +225,7 @@ class tool_sentiment_forum_watson_testcase extends advanced_testcase {
         $response = $stub->analyze_sentiment('the test text');
         list($sentiment, $emotion, $keywords, $concepts) = $response;
 
+        // Check the results.
         $this->assertEquals($sentiment, 0.9);
         $this->assertEquals($emotion['sadness'], 0.0195);
         $this->assertEquals($emotion['joy'], 0.785);
@@ -249,6 +250,7 @@ class tool_sentiment_forum_watson_testcase extends advanced_testcase {
         $response = $stub->analyze_sentiment('the test text');
         list($sentiment, $emotion, $keywords, $concepts) = $response;
 
+        // Check the results.
         $this->assertEquals($sentiment, 0);
         $this->assertEquals($emotion['sadness'], 0);
         $this->assertEquals($emotion['joy'], 0);
@@ -258,5 +260,41 @@ class tool_sentiment_forum_watson_testcase extends advanced_testcase {
         $this->assertEquals($keywords, array());
         $this->assertEquals($concepts, array());
 
+    }
+
+    /**
+     * Test analyze sentiment request format.
+     */
+    public function test_analyze_sentiment_request() {
+        $this->resetAfterTest(true);
+        set_config('apiendpoint', 'https://localhost:8080', 'tool_sentiment_forum');
+        set_config('maxkeywords', 1, 'tool_sentiment_forum');
+        set_config('maxconcepts', 1, 'tool_sentiment_forum');
+
+        $container = [];
+        $history = Middleware::history($container);
+
+        // Create a mock response and stack.
+        $mock = new MockHandler([
+                new Response(200, ['Content-Type' => 'application/json'], '{"properties":"value"}')
+        ]);
+
+        $stack = HandlerStack::create($mock);
+        $stack->push($history); // Add the history middleware to the handler stack.
+
+        $client = new tool_sentiment_forum\watson\watson_api($stack);
+        $client->token = '1234';
+
+        $response = $client->analyze_sentiment('the test text');
+        $request = $container[0]['request'];
+        $requestbody = json_decode($request->getBody()->getContents());
+
+        error_log(print_r($requestbody, true));
+
+        // Check the results.
+        $this->assertEquals($request->getUri()->getScheme(), 'https');
+        $this->assertEquals($request->getUri()->getHost(),  'localhost');
+        $this->assertEquals($request->getUri()->getPort(),  '8080');
+        $this->assertTrue($request->hasHeader('content-type'));
     }
 }
