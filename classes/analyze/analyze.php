@@ -144,7 +144,7 @@ class analyze {
     public function get_unanalyzed_posts($forumid) {
         global $DB;
 
-        $posts = $DB->get_records_sql(
+        $posts = $DB->get_recordset_sql(
                 'SELECT f.* FROM {forum_posts} f
                 LEFT JOIN {forum_discussions} fd
                 ON f.discussion = fd.id
@@ -282,9 +282,12 @@ class analyze {
         }
 
         // If new posts have been analyzed update forum sentiment.
-        if (!empty($posts)) {
+        $posts->rewind();
+        if ($posts->valid()) {
             $this->update_sentiment_forum($forumid);
         }
+
+        $posts->close(); // Close recordset.
 
         return true;
     }

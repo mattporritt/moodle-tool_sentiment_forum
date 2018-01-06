@@ -55,7 +55,12 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $forums = $analyzer->get_enabled_forums();
         $forumresult = $forums->current();
 
-        $this->assertEquals(1, count($forums));
+        $count = 0;
+        foreach ($forums as $forum) {
+            $count++;
+        }
+
+        $this->assertEquals(1, $count);
         $this->assertEquals($forum2->id, $forumresult->forumid);
         $forums->close();  // Close forums recordset.
 
@@ -82,7 +87,12 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $forums = $analyzer->get_enabled_forums($course1->id);
         $forumresult = $forums->current();
 
-        $this->assertEquals(1, count($forums));
+        $count = 0;
+        foreach ($forums as $forum) {
+            $count++;
+        }
+
+        $this->assertEquals(1, $count);
         $this->assertEquals($forum1->id, $forumresult->forumid);
         $forums->close();  // Close forums recordset.
 
@@ -118,7 +128,13 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $analyzer = new analyze();
         $posts = $analyzer->get_unanalyzed_posts($forum->id);
 
-        $this->assertEquals(2, count($posts));
+        $count = 0;
+        foreach ($posts as $post) {
+            $count++;
+        }
+
+        $this->assertEquals(2, $count);
+        $posts->close(); // Close recordset.
 
     }
 }
