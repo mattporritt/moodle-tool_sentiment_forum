@@ -289,12 +289,13 @@ class tool_sentiment_forum_watson_testcase extends advanced_testcase {
         $request = $container[0]['request'];
         $requestbody = json_decode($request->getBody()->getContents());
 
-        error_log(print_r($requestbody, true));
-
         // Check the results.
         $this->assertEquals($request->getUri()->getScheme(), 'https');
         $this->assertEquals($request->getUri()->getHost(),  'localhost');
         $this->assertEquals($request->getUri()->getPort(),  '8080');
         $this->assertTrue($request->hasHeader('content-type'));
+        $this->assertEquals($requestbody->text,  'the test text');
+        $this->assertEquals($requestbody->features->keywords->limit, 1);
+        $this->assertEquals($requestbody->features->concepts->limit, 1);
     }
 }
