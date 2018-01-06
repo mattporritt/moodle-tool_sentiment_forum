@@ -57,7 +57,7 @@ class analyze_posts extends \core\task\scheduled_task {
         $analyzer = new analyze();
 
         mtrace('Getting Forums to perform sentinment analysis on...');
-        $forums = $analyzer->get_enabled_forums();
+        $forums = $analyzer->get_enabled_forums(); // Get forums as recordset.
 
         foreach ($forums as $forum) {
             $forumid = $forum->forumid;
@@ -65,6 +65,8 @@ class analyze_posts extends \core\task\scheduled_task {
             $analyzer->analyze_forum($forumid);
 
         }
+
+        $forums->close();  // Close forums recordset.
 
     }
 }

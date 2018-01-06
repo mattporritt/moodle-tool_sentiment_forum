@@ -64,7 +64,7 @@ class analyze {
             $params = array('1');
         }
 
-        $forums = $DB->get_records_sql(
+        $forums = $DB->get_recordset_sql(
                 'SELECT sf.*, f.course, f.type, f.name
                 FROM {tool_sentiment_forum} sf
                 LEFT JOIN {forum} f

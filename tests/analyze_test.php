@@ -53,7 +53,7 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         // Get enabled forums and check results.
         $analyzer = new analyze();
         $forums = $analyzer->get_enabled_forums();
-        $forumresult = reset($forums);
+        $forumresult = $forums->current();
 
         $this->assertEquals(1, count($forums));
         $this->assertEquals($forum2->id, $forumresult->forumid);
@@ -79,7 +79,7 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         // Get enabled forums and check results.
         $analyzer = new analyze();
         $forums = $analyzer->get_enabled_forums($course1->id);
-        $forumresult = reset($forums);
+        $forumresult = $forums->current();
 
         $this->assertEquals(1, count($forums));
         $this->assertEquals($forum1->id, $forumresult->forumid);
