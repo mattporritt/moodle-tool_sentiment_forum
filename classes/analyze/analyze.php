@@ -148,7 +148,7 @@ class analyze {
                 'SELECT f.* FROM {forum_posts} f
                 LEFT JOIN {forum_discussions} fd
                 ON f.discussion = fd.id
-                LEFT JOIN mdl_sentiment_forum_posts sfp
+                LEFT JOIN {tool_sentiment_forum_posts} sfp
                 ON sfp.postid = f.id
                 WHERE sfp.timeposted is null AND fd.forum = ?',
                 array($forumid)
