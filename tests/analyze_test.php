@@ -57,6 +57,7 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
 
         $this->assertEquals(1, count($forums));
         $this->assertEquals($forum2->id, $forumresult->forumid);
+        $forums->close();  // Close forums recordset.
 
     }
 
@@ -83,6 +84,41 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
 
         $this->assertEquals(1, count($forums));
         $this->assertEquals($forum1->id, $forumresult->forumid);
+        $forums->close();  // Close forums recordset.
+
+    }
+
+    /**
+     * Test get_unanalyzed_posts method.
+     */
+    public function test_get_unanalyzed_posts() {
+        global $DB;
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_user();
+        $course = $generator->create_course(); // Create a course.
+        $forum = $generator->create_module('forum', array(
+            'course' => $course->id,
+            'sentimentenabled' => 1)); // Create forum with sentiment analysis enabled.
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $generator->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $generator->get_plugin_generator('mod_forum')->create_post($record);
+
+        // Get enabled forums and check results.
+        $analyzer = new analyze();
+        $posts = $analyzer->get_unanalyzed_posts($forum->id);
+
+        $this->assertEquals(2, count($posts));
 
     }
 }
