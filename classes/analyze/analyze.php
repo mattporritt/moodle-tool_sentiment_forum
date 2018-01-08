@@ -161,7 +161,7 @@ class analyze {
      * Store individual forum post sentiment in Moodle database
      *
      * @param int $forumid The forum ID.
-     * @param object $post The post ID.
+     * @param object $post The post object.
      * @param int $sentiment The sentiment value
      * @param array $emotion Array of emotions.
      * @return boolean $result true on record insert
@@ -183,6 +183,26 @@ class analyze {
         $result = $DB->insert_record('tool_sentiment_forum_posts', $record);
 
         return $result;
+    }
+
+    /**
+     *
+     * @param int $forumid The forum ID.
+     * @param object $post The post object.
+     * @param unknown $keywords
+     */
+    public function insert_keywords_post($forumid, $post, $keywords){
+
+    }
+
+    /**
+     *
+     * @param int $forumid The forum ID.
+     * @param object $post The post object.
+     * @param unknown $concepts
+     */
+    public function insert_concepts_post($forumid, $post, $concepts){
+
     }
 
     /**
@@ -275,10 +295,16 @@ class analyze {
             $analyzestring = $subject . ' ' . $message;
 
             // Analyze string.
-            list($sentiment, $emotion) = $watson->analyze_sentiment($analyzestring);
+            list($sentiment, $emotion, $keywords, $concepts) = $watson->analyze_sentiment($analyzestring);
 
-            // Update Database with post sentiment.
+            // Update Database with post sentiment and emotion.
             $this->insert_sentiment_post($forumid, $post, $sentiment, $emotion);
+
+            // Update Database with post keywords.
+            $this->insert_keywords_post($forumid, $post, $keywords);
+
+            // Update Database with post concepts.
+            $this->insert_concepts_post($forumid, $post, $concepts);
         }
 
         // If new posts have been analyzed update forum sentiment.
