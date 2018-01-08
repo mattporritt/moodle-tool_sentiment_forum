@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="admin/tool/log/store/standard/db" VERSION="20140415" COMMENT="XMLDB file for Moodle admin/tool/log/store/standard"
+<XMLDB PATH="admin/tool/log/store/standard/db" VERSION="20180108" COMMENT="XMLDB file for Moodle admin/tool/sentiment_forum"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../../../lib/xmldb/xmldb.xsd"
 >
@@ -7,9 +7,9 @@
     <TABLE NAME="tool_sentiment_forum" COMMENT="Forum Table">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" UNIQUE="true" COMMENT="primary id for core forum table"/>
-        <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="1" COMMENT="is sentiment enabled for this forum"/>
-        <FIELD NAME="sentiment" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false"  DECIMALS="6" COMMENT="the forum sentiment"/>
+        <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="primary id for core forum table"/>
+        <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="is sentiment enabled for this forum"/>
+        <FIELD NAME="sentiment" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6" COMMENT="the forum sentiment"/>
         <FIELD NAME="sadness" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
         <FIELD NAME="joy" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
         <FIELD NAME="fear" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
@@ -27,9 +27,9 @@
     <TABLE NAME="tool_sentiment_forum_posts" COMMENT="Forum Posts Table">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" UNIQUE="false" COMMENT="primary id for core forum table"/>
-        <FIELD NAME="postid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" UNIQUE="false" COMMENT="primary id for core posts table"/>
-        <FIELD NAME="sentiment" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false"  DECIMALS="6" COMMENT="the post sentiment"/>
+        <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="primary id for core forum table"/>
+        <FIELD NAME="postid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="primary id for core posts table"/>
+        <FIELD NAME="sentiment" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6" COMMENT="the post sentiment"/>
         <FIELD NAME="sadness" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
         <FIELD NAME="joy" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
         <FIELD NAME="fear" TYPE="number" LENGTH="7" NOTNULL="false" SEQUENCE="false" DECIMALS="6"/>
@@ -42,6 +42,122 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="posts" UNIQUE="true" FIELDS="forumid, postid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_sentiment_forum_concept" COMMENT="Table to store concept words and an overall count">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="concept" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the concept word"/>
+        <FIELD NAME="conceptcount" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="the total count for the concept word"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="concept" UNIQUE="true" FIELDS="concept"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_sentiment_forum_c_forum" COMMENT="The concept table for forums. Stores relation between forum and concepts">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="conceptid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the concept word in the concept table"/>
+        <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the forum this concept relates to"/>
+        <FIELD NAME="conceptcount" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="the total count for the concept word"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="conceptid" UNIQUE="false" FIELDS="conceptid"/>
+        <INDEX NAME="forumid" UNIQUE="false" FIELDS="forumid"/>
+      </INDEXES>
+    </TABLE>
+        <TABLE NAME="tool_sentiment_forum_c_post" COMMENT="The concept table for posts. Stores relation between posts and concepts">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="conceptid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the concept word in the concept table"/>
+        <FIELD NAME="postid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the post this concept relates to"/>
+        <FIELD NAME="conceptcount" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="the total count for the concept word"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="conceptid" UNIQUE="false" FIELDS="conceptid"/>
+        <INDEX NAME="postid" UNIQUE="false" FIELDS="postid"/>
+      </INDEXES>
+    </TABLE>
+        <TABLE NAME="tool_sentiment_forum_c_user" COMMENT="The concept table for users. Stores relation between users and concepts">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="conceptid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the concept word in the concept table"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the user this concept relates to"/>
+        <FIELD NAME="conceptcount" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="the total count for the concept word"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="conceptid" UNIQUE="false" FIELDS="conceptid"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_sentiment_forum_keyword" COMMENT="Table to store keywords and an overall count">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="keyword" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the keyword word"/>
+        <FIELD NAME="keywordcount" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="the total count for the keyword"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="keyword" UNIQUE="true" FIELDS="keyword"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_sentiment_forum_k_forum" COMMENT="The keyword table for forums. Stores relation between forum and keywords">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="keywordid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the keyword in the keyword table"/>
+        <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the forum this keyword relates to"/>
+        <FIELD NAME="keywordcount" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="the total count for the keyword"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="keywordid" UNIQUE="false" FIELDS="keywordid"/>
+        <INDEX NAME="forumid" UNIQUE="false" FIELDS="forumid"/>
+      </INDEXES>
+    </TABLE>
+        <TABLE NAME="tool_sentiment_forum_k_post" COMMENT="The keyword table for posts. Stores relation between posts and keywords">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="keywordid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the keyword in the keyword table"/>
+        <FIELD NAME="postid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the post this keyword relates to"/>
+        <FIELD NAME="keywordcount" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="the total count for the keyword"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="keywordid" UNIQUE="false" FIELDS="keywordid"/>
+        <INDEX NAME="postid" UNIQUE="false" FIELDS="postid"/>
+      </INDEXES>
+    </TABLE>
+        <TABLE NAME="tool_sentiment_forum_k_user" COMMENT="The keyword table for users. Stores relation between users and keywords">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="keywordid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the keyword in the concept table"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the user this keyword relates to"/>
+        <FIELD NAME="keywordcount" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="the total count for the keyword"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="keywordid" UNIQUE="false" FIELDS="keywordid"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
       </INDEXES>
     </TABLE>
   </TABLES>
