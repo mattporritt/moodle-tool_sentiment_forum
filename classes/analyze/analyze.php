@@ -192,7 +192,62 @@ class analyze {
      * @param unknown $keywords
      */
     public function insert_keywords_post($forumid, $post, $keywords){
+        global $DB;
 
+        foreach ($keywords as $keyword) {
+
+            // Insert into keyword table.
+            $lcasekeyword = strtolower($keyword->text);
+            $record = new \stdClass();
+            $record->keyword = $lcasekeyword;
+            $record->keywordcount = 1;
+
+            try { // Try insert.
+                $keywordid = $DB->insert_record('tool_sentiment_forum_keyword', $record, false);
+            } catch (\Exception $e) { // Insert failed try update.
+                $transaction = $DB->start_delegated_transaction();
+                $keywordid = $DB->get_field('tool_sentiment_forum_keyword', 'id', array ('keyword' => $record->keyword));
+                $record->id = $keywordid;
+                $record->keywordcount = $record->keywordcount + 1; // Increment count
+                $DB->update_record('tool_sentiment_forum_keyword', $record);
+                $transaction->allow_commit();
+            }
+
+            // Insert into Keyword forum table.
+            $record = new \stdClass();
+            $record->keywordid = $keywordid;
+            $record->forumid = $forumid;
+            $record->keywordcount = 1;
+
+            try { // Try insert.
+                $kwforurmid = $DB->insert_record('tool_sentiment_forum_k_forum', $record, false);
+            } catch (\Exception $e) { // Insert failed try update.
+                $transaction = $DB->start_delegated_transaction();
+                $kwforurmid = $DB->get_field('tool_sentiment_forum_k_forum', 'id', array ('keywordid' => $record->keywordid));
+                $record->id = $kwforurmid;
+                $record->keywordcount = $record->keywordcount + 1; // Increment count
+                $DB->update_record('tool_sentiment_forum_k_forum', $record);
+                $transaction->allow_commit();
+            }
+
+            // Insert into Keyword post table.
+            $record = new \stdClass();
+            $record->keywordid = $keywordid;
+            $record->postid = $post->id;
+            $record->keywordcount = 1;
+
+            try { // Try insert.
+                $kwpostid = $DB->insert_record('tool_sentiment_forum_k_post', $record, false);
+            } catch (\Exception $e) { // Insert failed try update.
+                $transaction = $DB->start_delegated_transaction();
+                $kwpostid = $DB->get_field('tool_sentiment_forum_k_post', 'id', array ('keywordid' => $record->keywordid));
+                $record->id = $kwpostid;
+                $record->keywordcount = $record->keywordcount + 1; // Increment count
+                $DB->update_record('tool_sentiment_forum_k_post', $record);
+                $transaction->allow_commit();
+            }
+
+        }
     }
 
     /**
