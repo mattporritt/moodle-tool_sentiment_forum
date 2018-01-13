@@ -243,4 +243,110 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $this->assertEquals(1, $postresult->keywordcount);
 
     }
+
+    /**
+     * Test insert concepts method.
+     */
+    public function test_insert_concepts_post() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $forumid = 1;
+        $post = new \stdClass();
+        $post->id = 2;
+        $concepts = array(array('text' => 'Service', 'relevance' => 0.945 ));
+
+        $analyzer = new analyze();
+        $analyzer->insert_concepts_post($forumid, $post, $concepts);
+
+        // Check concept.
+        $conceptresult = $DB->get_record('tool_sentiment_forum_concept', array('concept' => 'service'));
+        $this->assertEquals(1, $conceptresult->conceptcount);
+
+        // Check forum concept.
+        $forumresult = $DB->get_record('tool_sentiment_forum_c_forum', array('forumid' => $forumid));
+        $this->assertEquals($conceptresult->id, $forumresult->conceptid);
+        $this->assertEquals($forumid, $forumresult->forumid);
+        $this->assertEquals(1, $forumresult->conceptcount);
+
+        // Check post concept.
+        $postresult = $DB->get_record('tool_sentiment_forum_c_post', array('postid' => $post->id));
+        $this->assertEquals($conceptresult->id, $forumresult->conceptid);
+        $this->assertEquals($post->id, $postresult->postid);
+        $this->assertEquals(1, $postresult->conceptcount);
+
+    }
+
+    /**
+     * Test insert concepts method with multiple entries.
+     */
+    public function test_insert_concepts_post_multiple_entries() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $forumid = 1;
+        $forumid2 = 2;
+        $post = new \stdClass();
+        $post->id = 2;
+        $post2 = new \stdClass();
+        $post2->id = 3;
+        $concepts = array(array('text' => 'Service', 'relevance' => 0.945 ));
+
+        $analyzer = new analyze();
+        $analyzer->insert_concepts_post($forumid, $post, $concepts);
+        $analyzer->insert_concepts_post($forumid2, $post2, $concepts);
+
+        // Check concept.
+        $conceptresult = $DB->get_record('tool_sentiment_forum_concept', array('concept' => 'service'));
+        $this->assertEquals(2, $conceptresult->conceptcount);
+
+        // Check forum concept.
+        $forumresult = $DB->get_record('tool_sentiment_forum_c_forum', array('forumid' => $forumid));
+        $this->assertEquals($conceptresult->id, $forumresult->conceptid);
+        $this->assertEquals($forumid, $forumresult->forumid);
+        $this->assertEquals(1, $forumresult->conceptcount);
+
+        // Check post concept.
+        $postresult = $DB->get_record('tool_sentiment_forum_c_post', array('postid' => $post->id));
+        $this->assertEquals($conceptresult->id, $forumresult->conceptid);
+        $this->assertEquals($post->id, $postresult->postid);
+        $this->assertEquals(1, $postresult->conceptcount);
+
+    }
+
+    /**
+     * Test insert concepts method with multiple concepts
+     */
+    public function test_insert_concepts_post_multiple_concepts() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $forumid = 1;
+        $post = new \stdClass();
+        $post->id = 2;
+        $concepts = array(
+            array('text' => 'Service', 'relevance' => 0.945 ),
+            array('text' => 'Insert', 'relevance' => 0.945 )
+        );
+
+        $analyzer = new analyze();
+        $analyzer->insert_concepts_post($forumid, $post, $concepts);
+
+        // Check concept.
+        $conceptresult = $DB->get_record('tool_sentiment_forum_concept', array('concept' => 'service'));
+        $this->assertEquals(1, $conceptresult->conceptcount);
+
+        // Check forum concept.
+        $forumresult = $DB->get_record('tool_sentiment_forum_c_forum', array('forumid' => $forumid, 'conceptid' => $conceptresult->id));
+        $this->assertEquals($conceptresult->id, $forumresult->conceptid);
+        $this->assertEquals($forumid, $forumresult->forumid);
+        $this->assertEquals(1, $forumresult->conceptcount);
+
+        // Check post concept.
+        $postresult = $DB->get_record('tool_sentiment_forum_c_post', array('postid' => $post->id, 'conceptid' => $conceptresult->id));
+        $this->assertEquals($conceptresult->id, $forumresult->conceptid);
+        $this->assertEquals($post->id, $postresult->postid);
+        $this->assertEquals(1, $postresult->conceptcount);
+
+    }
 }
