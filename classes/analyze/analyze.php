@@ -197,13 +197,13 @@ class analyze {
         foreach ($keywords as $keyword) {
 
             // Insert into keyword table.
-            $lcasekeyword = strtolower($keyword->text);
+            $lcasekeyword = strtolower($keyword['text']);
             $record = new \stdClass();
             $record->keyword = $lcasekeyword;
             $record->keywordcount = 1;
 
             try { // Try insert.
-                $keywordid = $DB->insert_record('tool_sentiment_forum_keyword', $record, false);
+                $keywordid = $DB->insert_record('tool_sentiment_forum_keyword', $record, true);
             } catch (\Exception $e) { // Insert failed try update.
                 $transaction = $DB->start_delegated_transaction();
                 $keywordid = $DB->get_field('tool_sentiment_forum_keyword', 'id', array ('keyword' => $record->keyword));
@@ -220,10 +220,11 @@ class analyze {
             $record->keywordcount = 1;
 
             try { // Try insert.
-                $kwforurmid = $DB->insert_record('tool_sentiment_forum_k_forum', $record, false);
+                $kwforurmid = $DB->insert_record('tool_sentiment_forum_k_forum', $record, true);
             } catch (\Exception $e) { // Insert failed try update.
                 $transaction = $DB->start_delegated_transaction();
-                $kwforurmid = $DB->get_field('tool_sentiment_forum_k_forum', 'id', array ('keywordid' => $record->keywordid));
+                $params = array ('forumid' => $record->forumid, 'keyword' => $record->keyword);
+                $kwforurmid = $DB->get_field('tool_sentiment_forum_k_forum', 'id', $params);
                 $record->id = $kwforurmid;
                 $record->keywordcount = $record->keywordcount + 1; // Increment count
                 $DB->update_record('tool_sentiment_forum_k_forum', $record);
@@ -237,10 +238,11 @@ class analyze {
             $record->keywordcount = 1;
 
             try { // Try insert.
-                $kwpostid = $DB->insert_record('tool_sentiment_forum_k_post', $record, false);
+                $kwpostid = $DB->insert_record('tool_sentiment_forum_k_post', $record, true);
             } catch (\Exception $e) { // Insert failed try update.
                 $transaction = $DB->start_delegated_transaction();
-                $kwpostid = $DB->get_field('tool_sentiment_forum_k_post', 'id', array ('keywordid' => $record->keywordid));
+                $params = array ('postid' => $record->postid, 'keyword' => $record->keyword);
+                $kwpostid = $DB->get_field('tool_sentiment_forum_k_post', 'id', $params);
                 $record->id = $kwpostid;
                 $record->keywordcount = $record->keywordcount + 1; // Increment count
                 $DB->update_record('tool_sentiment_forum_k_post', $record);

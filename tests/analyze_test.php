@@ -137,4 +137,110 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $posts->close(); // Close recordset.
 
     }
+
+    /**
+     * Test insert keywords method.
+     */
+    public function test_insert_keywords_post() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $forumid = 1;
+        $post = new \stdClass();
+        $post->id = 2;
+        $keywords = array(array('text' => 'Service', 'relevance' => 0.945 ));
+
+        $analyzer = new analyze();
+        $analyzer->insert_keywords_post($forumid, $post, $keywords);
+
+        // Check keyword.
+        $keywordresult = $DB->get_record('tool_sentiment_forum_keyword', array('keyword' => 'service'));
+        $this->assertEquals(1, $keywordresult->keywordcount);
+
+        // Check forum keyword.
+        $forumresult = $DB->get_record('tool_sentiment_forum_k_forum', array('forumid' => $forumid));
+        $this->assertEquals($keywordresult->id, $forumresult->keywordid);
+        $this->assertEquals($forumid, $forumresult->forumid);
+        $this->assertEquals(1, $forumresult->keywordcount);
+
+        // Check post keyword.
+        $postresult = $DB->get_record('tool_sentiment_forum_k_post', array('postid' => $post->id));
+        $this->assertEquals($keywordresult->id, $forumresult->keywordid);
+        $this->assertEquals($post->id, $postresult->postid);
+        $this->assertEquals(1, $postresult->keywordcount);
+
+    }
+
+    /**
+     * Test insert keywords method with multiple entries.
+     */
+    public function test_insert_keywords_post_multiple_entries() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $forumid = 1;
+        $forumid2 = 2;
+        $post = new \stdClass();
+        $post->id = 2;
+        $post2 = new \stdClass();
+        $post2->id = 3;
+        $keywords = array(array('text' => 'Service', 'relevance' => 0.945 ));
+
+        $analyzer = new analyze();
+        $analyzer->insert_keywords_post($forumid, $post, $keywords);
+        $analyzer->insert_keywords_post($forumid2, $post2, $keywords);
+
+        // Check keyword.
+        $keywordresult = $DB->get_record('tool_sentiment_forum_keyword', array('keyword' => 'service'));
+        $this->assertEquals(2, $keywordresult->keywordcount);
+
+        // Check forum keyword.
+        $forumresult = $DB->get_record('tool_sentiment_forum_k_forum', array('forumid' => $forumid));
+        $this->assertEquals($keywordresult->id, $forumresult->keywordid);
+        $this->assertEquals($forumid, $forumresult->forumid);
+        $this->assertEquals(1, $forumresult->keywordcount);
+
+        // Check post keyword.
+        $postresult = $DB->get_record('tool_sentiment_forum_k_post', array('postid' => $post->id));
+        $this->assertEquals($keywordresult->id, $forumresult->keywordid);
+        $this->assertEquals($post->id, $postresult->postid);
+        $this->assertEquals(1, $postresult->keywordcount);
+
+    }
+
+    /**
+     * Test insert keywords method with multiple keywords
+     */
+    public function test_insert_keywords_post_multiple_keywords() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $forumid = 1;
+        $post = new \stdClass();
+        $post->id = 2;
+        $keywords = array(
+            array('text' => 'Service', 'relevance' => 0.945 ),
+            array('text' => 'Insert', 'relevance' => 0.945 )
+        );
+
+        $analyzer = new analyze();
+        $analyzer->insert_keywords_post($forumid, $post, $keywords);
+
+        // Check keyword.
+        $keywordresult = $DB->get_record('tool_sentiment_forum_keyword', array('keyword' => 'service'));
+        $this->assertEquals(1, $keywordresult->keywordcount);
+
+        // Check forum keyword.
+        $forumresult = $DB->get_record('tool_sentiment_forum_k_forum', array('forumid' => $forumid, 'keywordid' => $keywordresult->id));
+        $this->assertEquals($keywordresult->id, $forumresult->keywordid);
+        $this->assertEquals($forumid, $forumresult->forumid);
+        $this->assertEquals(1, $forumresult->keywordcount);
+
+        // Check post keyword.
+        $postresult = $DB->get_record('tool_sentiment_forum_k_post', array('postid' => $post->id, 'keywordid' => $keywordresult->id));
+        $this->assertEquals($keywordresult->id, $forumresult->keywordid);
+        $this->assertEquals($post->id, $postresult->postid);
+        $this->assertEquals(1, $postresult->keywordcount);
+
+    }
 }
