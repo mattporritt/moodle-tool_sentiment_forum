@@ -209,6 +209,13 @@ class analyze {
         return $upsertid;
     }
 
+    /**
+     *
+     * @param unknown $type
+     * @param unknown $values
+     * @param unknown $forumid
+     * @param unknown $post
+     */
     public function insert_keywords_concepts($type, $values, $forumid, $post) {
         global $DB;
 
@@ -256,26 +263,6 @@ class analyze {
             $this->record_upsert($record, $posttable, $params);
         }
 
-    }
-
-    /**
-     *
-     * @param int $forumid The forum ID.
-     * @param object $post The post object.
-     * @param unknown $keywords
-     */
-    public function insert_keywords($forumid, $post, $keywords){
-        $this->insert_keywords_concepts('keyword', $keywords, $forumid, $post);
-    }
-
-    /**
-     *
-     * @param int $forumid The forum ID.
-     * @param object $post The post object.
-     * @param unknown $concepts
-     */
-    public function insert_concepts($forumid, $post, $concepts){
-        $this->insert_keywords_concepts('concept', $concepts, $forumid, $post);
     }
 
     /**
@@ -374,10 +361,10 @@ class analyze {
             $this->insert_sentiment_post($forumid, $post, $sentiment, $emotion);
 
             // Update Database with post keywords.
-            $this->insert_keywords($forumid, $post, $keywords);
+            $this->insert_keywords_concepts('keyword', $keywords, $forumid, $post);
 
             // Update Database with post concepts.
-            $this->insert_concepts($forumid, $post, $concepts);
+            $this->insert_keywords_concepts('concept', $concepts, $forumid, $post);
         }
 
         // If new posts have been analyzed update forum sentiment.

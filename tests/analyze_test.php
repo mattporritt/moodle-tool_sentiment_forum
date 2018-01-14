@@ -151,7 +151,7 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $keywords = array(array('text' => 'Service', 'relevance' => 0.945 ));
 
         $analyzer = new analyze();
-        $analyzer->insert_keywords($forumid, $post, $keywords);
+        $analyzer->insert_keywords_concepts('keyword', $keywords, $forumid, $post);
 
         // Check keyword.
         $keywordresult = $DB->get_record('tool_sentiment_forum_keyword', array('keyword' => 'service'));
@@ -187,8 +187,8 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $keywords = array(array('text' => 'Service', 'relevance' => 0.945 ));
 
         $analyzer = new analyze();
-        $analyzer->insert_keywords($forumid, $post, $keywords);
-        $analyzer->insert_keywords($forumid2, $post2, $keywords);
+        $analyzer->insert_keywords_concepts('keyword', $keywords, $forumid, $post);
+        $analyzer->insert_keywords_concepts('keyword', $keywords, $forumid2, $post2);
 
         // Check keyword.
         $keywordresult = $DB->get_record('tool_sentiment_forum_keyword', array('keyword' => 'service'));
@@ -224,7 +224,7 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         );
 
         $analyzer = new analyze();
-        $analyzer->insert_keywords($forumid, $post, $keywords);
+        $analyzer->insert_keywords_concepts('keyword', $keywords, $forumid, $post);
 
         // Check keyword.
         $keywordresult = $DB->get_record('tool_sentiment_forum_keyword', array('keyword' => 'service'));
@@ -257,7 +257,7 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $concepts = array(array('text' => 'Service', 'relevance' => 0.945 ));
 
         $analyzer = new analyze();
-        $analyzer->insert_concepts($forumid, $post, $concepts);
+        $analyzer->insert_keywords_concepts('concept', $concepts, $forumid, $post);
 
         // Check concept.
         $conceptresult = $DB->get_record('tool_sentiment_forum_concept', array('concept' => 'service'));
@@ -293,8 +293,8 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $concepts = array(array('text' => 'Service', 'relevance' => 0.945 ));
 
         $analyzer = new analyze();
-        $analyzer->insert_concepts($forumid, $post, $concepts);
-        $analyzer->insert_concepts($forumid2, $post2, $concepts);
+        $analyzer->insert_keywords_concepts('concept', $concepts, $forumid, $post);
+        $analyzer->insert_keywords_concepts('concept', $concepts, $forumid2, $post2);
 
         // Check concept.
         $conceptresult = $DB->get_record('tool_sentiment_forum_concept', array('concept' => 'service'));
@@ -330,7 +330,7 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         );
 
         $analyzer = new analyze();
-        $analyzer->insert_concepts($forumid, $post, $concepts);
+        $analyzer->insert_keywords_concepts('concept', $concepts, $forumid, $post);
 
         // Check concept.
         $conceptresult = $DB->get_record('tool_sentiment_forum_concept', array('concept' => 'service'));
@@ -347,6 +347,54 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $this->assertEquals($conceptresult->id, $forumresult->conceptid);
         $this->assertEquals($post->id, $postresult->postid);
         $this->assertEquals(1, $postresult->count);
+
+    }
+
+    /**
+     * Test insert concepts method with multiple concepts
+     */
+    public function test_record_upsert_insert() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $tablename = 'tool_sentiment_forum_keyword';
+        $lcasevalue = 'test';
+        $params = array ('keyword' => $lcasevalue);
+        $record = new \stdClass();
+        $record->keyword = $lcasevalue;
+        $record->count = 1;
+
+
+        $analyzer = new analyze();
+        $analyzer->record_upsert($record, $tablename, $params);
+
+        $result = $DB->get_record('tool_sentiment_forum_keyword', $params);
+        $this->assertEquals(1, $result->count);
+
+    }
+
+    /**
+     * Test insert concepts method with multiple concepts
+     */
+    public function test_record_upsert_update() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $tablename = 'tool_sentiment_forum_keyword';
+        $lcasevalue = 'test';
+        $params = array ('keyword' => $lcasevalue);
+        $record = new \stdClass();
+        $record->keyword = $lcasevalue;
+        $record->count = 1;
+
+
+        $analyzer = new analyze();
+        $analyzer->record_upsert($record, $tablename, $params);
+        $analyzer->record_upsert($record, $tablename, $params);
+        $analyzer->record_upsert($record, $tablename, $params);
+
+        $result = $DB->get_record('tool_sentiment_forum_keyword', $params);
+        $this->assertEquals(3, $result->count);
 
     }
 }
