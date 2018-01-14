@@ -231,13 +231,15 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $this->assertEquals(1, $keywordresult->count);
 
         // Check forum keyword.
-        $forumresult = $DB->get_record('tool_sentiment_forum_k_forum', array('forumid' => $forumid, 'keywordid' => $keywordresult->id));
+        $forumresult = $DB->get_record('tool_sentiment_forum_k_forum',
+            array('forumid' => $forumid, 'keywordid' => $keywordresult->id));
         $this->assertEquals($keywordresult->id, $forumresult->keywordid);
         $this->assertEquals($forumid, $forumresult->forumid);
         $this->assertEquals(1, $forumresult->count);
 
         // Check post keyword.
-        $postresult = $DB->get_record('tool_sentiment_forum_k_post', array('postid' => $post->id, 'keywordid' => $keywordresult->id));
+        $postresult = $DB->get_record('tool_sentiment_forum_k_post',
+            array('postid' => $post->id, 'keywordid' => $keywordresult->id));
         $this->assertEquals($keywordresult->id, $forumresult->keywordid);
         $this->assertEquals($post->id, $postresult->postid);
         $this->assertEquals(1, $postresult->count);
@@ -337,13 +339,15 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $this->assertEquals(1, $conceptresult->count);
 
         // Check forum concept.
-        $forumresult = $DB->get_record('tool_sentiment_forum_c_forum', array('forumid' => $forumid, 'conceptid' => $conceptresult->id));
+        $forumresult = $DB->get_record('tool_sentiment_forum_c_forum',
+            array('forumid' => $forumid, 'conceptid' => $conceptresult->id));
         $this->assertEquals($conceptresult->id, $forumresult->conceptid);
         $this->assertEquals($forumid, $forumresult->forumid);
         $this->assertEquals(1, $forumresult->count);
 
         // Check post concept.
-        $postresult = $DB->get_record('tool_sentiment_forum_c_post', array('postid' => $post->id, 'conceptid' => $conceptresult->id));
+        $postresult = $DB->get_record('tool_sentiment_forum_c_post',
+            array('postid' => $post->id, 'conceptid' => $conceptresult->id));
         $this->assertEquals($conceptresult->id, $forumresult->conceptid);
         $this->assertEquals($post->id, $postresult->postid);
         $this->assertEquals(1, $postresult->count);
@@ -363,7 +367,6 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $record = new \stdClass();
         $record->keyword = $lcasevalue;
         $record->count = 1;
-
 
         $analyzer = new analyze();
         $analyzer->record_upsert($record, $tablename, $params);
@@ -386,7 +389,6 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $record = new \stdClass();
         $record->keyword = $lcasevalue;
         $record->count = 1;
-
 
         $analyzer = new analyze();
         $analyzer->record_upsert($record, $tablename, $params);

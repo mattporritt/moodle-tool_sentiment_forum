@@ -186,13 +186,15 @@ class analyze {
     }
 
     /**
+     * Insert or update records into the database for keyword
+     * and concept results.
      *
-     * @param unknown $record
-     * @param unknown $tablename
-     * @param array $params
-     * @return unknown
+     * @param \stdClass $record The record to insert in the database.
+     * @param string $tablename The table  to update.
+     * @param array $params The selction criteria.
+     * @return integer $upsertid The id of the altered record.
      */
-    public function record_upsert($record, $tablename, $params=array()){
+    public function record_upsert($record, $tablename, $params=array()) {
         global $DB;
 
         try { // Try insert.
@@ -201,7 +203,7 @@ class analyze {
             $transaction = $DB->start_delegated_transaction();
             $upsertid = $DB->get_field($tablename, 'id', $params);
             $record->id = $upsertid;
-            $record->count = $record->count + 1; // Increment count
+            $record->count = $record->count + 1; // Increment count.
             $DB->update_record($tablename, $record);
             $transaction->allow_commit();
         }
@@ -210,11 +212,13 @@ class analyze {
     }
 
     /**
+     * Insert keywords or concpets into the database.
+     * Update all related tables.
      *
-     * @param unknown $type
-     * @param unknown $values
-     * @param unknown $forumid
-     * @param unknown $post
+     * @param string $type The type to update, keyword or concept.
+     * @param array $values The array of values to insert.
+     * @param integer $forumid The forum related to the records
+     * @param \stdClass $post The post record related to values..
      */
     public function insert_keywords_concepts($type, $values, $forumid, $post) {
         global $DB;
