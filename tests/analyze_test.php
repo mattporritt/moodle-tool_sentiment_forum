@@ -141,7 +141,7 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
     /**
      * Test insert keywords method.
      */
-    public function test_insert_keywords_post() {
+    public function test_insert_keywords() {
         global $DB;
         $this->resetAfterTest(true);
 
@@ -151,30 +151,30 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $keywords = array(array('text' => 'Service', 'relevance' => 0.945 ));
 
         $analyzer = new analyze();
-        $analyzer->insert_keywords_post($forumid, $post, $keywords);
+        $analyzer->insert_keywords($forumid, $post, $keywords);
 
         // Check keyword.
         $keywordresult = $DB->get_record('tool_sentiment_forum_keyword', array('keyword' => 'service'));
-        $this->assertEquals(1, $keywordresult->keywordcount);
+        $this->assertEquals(1, $keywordresult->count);
 
         // Check forum keyword.
         $forumresult = $DB->get_record('tool_sentiment_forum_k_forum', array('forumid' => $forumid));
         $this->assertEquals($keywordresult->id, $forumresult->keywordid);
         $this->assertEquals($forumid, $forumresult->forumid);
-        $this->assertEquals(1, $forumresult->keywordcount);
+        $this->assertEquals(1, $forumresult->count);
 
         // Check post keyword.
         $postresult = $DB->get_record('tool_sentiment_forum_k_post', array('postid' => $post->id));
         $this->assertEquals($keywordresult->id, $forumresult->keywordid);
         $this->assertEquals($post->id, $postresult->postid);
-        $this->assertEquals(1, $postresult->keywordcount);
+        $this->assertEquals(1, $postresult->count);
 
     }
 
     /**
      * Test insert keywords method with multiple entries.
      */
-    public function test_insert_keywords_post_multiple_entries() {
+    public function test_insert_keywords_multiple_entries() {
         global $DB;
         $this->resetAfterTest(true);
 
@@ -187,31 +187,31 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $keywords = array(array('text' => 'Service', 'relevance' => 0.945 ));
 
         $analyzer = new analyze();
-        $analyzer->insert_keywords_post($forumid, $post, $keywords);
-        $analyzer->insert_keywords_post($forumid2, $post2, $keywords);
+        $analyzer->insert_keywords($forumid, $post, $keywords);
+        $analyzer->insert_keywords($forumid2, $post2, $keywords);
 
         // Check keyword.
         $keywordresult = $DB->get_record('tool_sentiment_forum_keyword', array('keyword' => 'service'));
-        $this->assertEquals(2, $keywordresult->keywordcount);
+        $this->assertEquals(2, $keywordresult->count);
 
         // Check forum keyword.
         $forumresult = $DB->get_record('tool_sentiment_forum_k_forum', array('forumid' => $forumid));
         $this->assertEquals($keywordresult->id, $forumresult->keywordid);
         $this->assertEquals($forumid, $forumresult->forumid);
-        $this->assertEquals(1, $forumresult->keywordcount);
+        $this->assertEquals(1, $forumresult->count);
 
         // Check post keyword.
         $postresult = $DB->get_record('tool_sentiment_forum_k_post', array('postid' => $post->id));
         $this->assertEquals($keywordresult->id, $forumresult->keywordid);
         $this->assertEquals($post->id, $postresult->postid);
-        $this->assertEquals(1, $postresult->keywordcount);
+        $this->assertEquals(1, $postresult->count);
 
     }
 
     /**
      * Test insert keywords method with multiple keywords
      */
-    public function test_insert_keywords_post_multiple_keywords() {
+    public function test_insert_keywords_multiple_keywords() {
         global $DB;
         $this->resetAfterTest(true);
 
@@ -224,30 +224,30 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         );
 
         $analyzer = new analyze();
-        $analyzer->insert_keywords_post($forumid, $post, $keywords);
+        $analyzer->insert_keywords($forumid, $post, $keywords);
 
         // Check keyword.
         $keywordresult = $DB->get_record('tool_sentiment_forum_keyword', array('keyword' => 'service'));
-        $this->assertEquals(1, $keywordresult->keywordcount);
+        $this->assertEquals(1, $keywordresult->count);
 
         // Check forum keyword.
         $forumresult = $DB->get_record('tool_sentiment_forum_k_forum', array('forumid' => $forumid, 'keywordid' => $keywordresult->id));
         $this->assertEquals($keywordresult->id, $forumresult->keywordid);
         $this->assertEquals($forumid, $forumresult->forumid);
-        $this->assertEquals(1, $forumresult->keywordcount);
+        $this->assertEquals(1, $forumresult->count);
 
         // Check post keyword.
         $postresult = $DB->get_record('tool_sentiment_forum_k_post', array('postid' => $post->id, 'keywordid' => $keywordresult->id));
         $this->assertEquals($keywordresult->id, $forumresult->keywordid);
         $this->assertEquals($post->id, $postresult->postid);
-        $this->assertEquals(1, $postresult->keywordcount);
+        $this->assertEquals(1, $postresult->count);
 
     }
 
     /**
      * Test insert concepts method.
      */
-    public function test_insert_concepts_post() {
+    public function test_insert_concepts() {
         global $DB;
         $this->resetAfterTest(true);
 
@@ -257,30 +257,30 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $concepts = array(array('text' => 'Service', 'relevance' => 0.945 ));
 
         $analyzer = new analyze();
-        $analyzer->insert_concepts_post($forumid, $post, $concepts);
+        $analyzer->insert_concepts($forumid, $post, $concepts);
 
         // Check concept.
         $conceptresult = $DB->get_record('tool_sentiment_forum_concept', array('concept' => 'service'));
-        $this->assertEquals(1, $conceptresult->conceptcount);
+        $this->assertEquals(1, $conceptresult->count);
 
         // Check forum concept.
         $forumresult = $DB->get_record('tool_sentiment_forum_c_forum', array('forumid' => $forumid));
         $this->assertEquals($conceptresult->id, $forumresult->conceptid);
         $this->assertEquals($forumid, $forumresult->forumid);
-        $this->assertEquals(1, $forumresult->conceptcount);
+        $this->assertEquals(1, $forumresult->count);
 
         // Check post concept.
         $postresult = $DB->get_record('tool_sentiment_forum_c_post', array('postid' => $post->id));
         $this->assertEquals($conceptresult->id, $forumresult->conceptid);
         $this->assertEquals($post->id, $postresult->postid);
-        $this->assertEquals(1, $postresult->conceptcount);
+        $this->assertEquals(1, $postresult->count);
 
     }
 
     /**
      * Test insert concepts method with multiple entries.
      */
-    public function test_insert_concepts_post_multiple_entries() {
+    public function test_insert_concepts_multiple_entries() {
         global $DB;
         $this->resetAfterTest(true);
 
@@ -293,31 +293,31 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         $concepts = array(array('text' => 'Service', 'relevance' => 0.945 ));
 
         $analyzer = new analyze();
-        $analyzer->insert_concepts_post($forumid, $post, $concepts);
-        $analyzer->insert_concepts_post($forumid2, $post2, $concepts);
+        $analyzer->insert_concepts($forumid, $post, $concepts);
+        $analyzer->insert_concepts($forumid2, $post2, $concepts);
 
         // Check concept.
         $conceptresult = $DB->get_record('tool_sentiment_forum_concept', array('concept' => 'service'));
-        $this->assertEquals(2, $conceptresult->conceptcount);
+        $this->assertEquals(2, $conceptresult->count);
 
         // Check forum concept.
         $forumresult = $DB->get_record('tool_sentiment_forum_c_forum', array('forumid' => $forumid));
         $this->assertEquals($conceptresult->id, $forumresult->conceptid);
         $this->assertEquals($forumid, $forumresult->forumid);
-        $this->assertEquals(1, $forumresult->conceptcount);
+        $this->assertEquals(1, $forumresult->count);
 
         // Check post concept.
         $postresult = $DB->get_record('tool_sentiment_forum_c_post', array('postid' => $post->id));
         $this->assertEquals($conceptresult->id, $forumresult->conceptid);
         $this->assertEquals($post->id, $postresult->postid);
-        $this->assertEquals(1, $postresult->conceptcount);
+        $this->assertEquals(1, $postresult->count);
 
     }
 
     /**
      * Test insert concepts method with multiple concepts
      */
-    public function test_insert_concepts_post_multiple_concepts() {
+    public function test_insert_concepts_multiple_concepts() {
         global $DB;
         $this->resetAfterTest(true);
 
@@ -330,23 +330,23 @@ class tool_sentiment_forum_analyze_testcase extends advanced_testcase {
         );
 
         $analyzer = new analyze();
-        $analyzer->insert_concepts_post($forumid, $post, $concepts);
+        $analyzer->insert_concepts($forumid, $post, $concepts);
 
         // Check concept.
         $conceptresult = $DB->get_record('tool_sentiment_forum_concept', array('concept' => 'service'));
-        $this->assertEquals(1, $conceptresult->conceptcount);
+        $this->assertEquals(1, $conceptresult->count);
 
         // Check forum concept.
         $forumresult = $DB->get_record('tool_sentiment_forum_c_forum', array('forumid' => $forumid, 'conceptid' => $conceptresult->id));
         $this->assertEquals($conceptresult->id, $forumresult->conceptid);
         $this->assertEquals($forumid, $forumresult->forumid);
-        $this->assertEquals(1, $forumresult->conceptcount);
+        $this->assertEquals(1, $forumresult->count);
 
         // Check post concept.
         $postresult = $DB->get_record('tool_sentiment_forum_c_post', array('postid' => $post->id, 'conceptid' => $conceptresult->id));
         $this->assertEquals($conceptresult->id, $forumresult->conceptid);
         $this->assertEquals($post->id, $postresult->postid);
-        $this->assertEquals(1, $postresult->conceptcount);
+        $this->assertEquals(1, $postresult->count);
 
     }
 }

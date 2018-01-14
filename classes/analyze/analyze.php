@@ -187,69 +187,85 @@ class analyze {
 
     /**
      *
+     * @param unknown $record
+     * @param unknown $tablename
+     * @param array $params
+     * @return unknown
+     */
+    public function record_upsert($record, $tablename, $params=array()){
+        global $DB;
+
+        try { // Try insert.
+            $upsertid = $DB->insert_record($tablename, $record, true);
+        } catch (\Exception $e) { // Insert failed try update.
+            $transaction = $DB->start_delegated_transaction();
+            $upsertid = $DB->get_field($tablename, 'id', $params);
+            $record->id = $upsertid;
+            $record->count = $record->count + 1; // Increment count
+            $DB->update_record($tablename, $record);
+            $transaction->allow_commit();
+        }
+
+        return $upsertid;
+    }
+
+    public function insert_keywords_concepts($type, $values, $forumid, $post) {
+        global $DB;
+
+        if ($type == 'keyword') {
+            $shorttype = 'k';
+            $typeid = 'keywordid';
+            $valuetable = 'tool_sentiment_forum_keyword';
+            $forumtable = 'tool_sentiment_forum_k_forum';
+            $posttable = 'tool_sentiment_forum_k_post';
+        } else {
+            $shorttype = 'c';
+            $typeid = 'conceptid';
+            $valuetable = 'tool_sentiment_forum_concept';
+            $forumtable = 'tool_sentiment_forum_c_forum';
+            $posttable = 'tool_sentiment_forum_c_post';
+        }
+
+        foreach ($values as $value) {
+
+            // Insert into keyword table.
+            $lcasevalue = strtolower($value['text']);
+            $record = new \stdClass();
+            $record->$type = $lcasevalue;
+            $record->count = 1;
+            $params = array ($type => $lcasevalue);
+
+            $valueid = $this->record_upsert($record, $valuetable, $params);
+
+            // Insert into Keyword forum table.
+            $record = new \stdClass();
+            $record->$typeid = $valueid;
+            $record->forumid = $forumid;
+            $record->count = 1;
+            $params = array ('forumid' => $record->forumid, $typeid => $valueid);
+
+            $this->record_upsert($record, $forumtable, $params);
+
+            // Insert into Keyword post table.
+            $record = new \stdClass();
+            $record->$typeid = $valueid;
+            $record->postid = $post->id;
+            $record->count = 1;
+            $params = array ('postid' => $record->postid, $typeid => $valueid);
+
+            $this->record_upsert($record, $posttable, $params);
+        }
+
+    }
+
+    /**
+     *
      * @param int $forumid The forum ID.
      * @param object $post The post object.
      * @param unknown $keywords
      */
-    public function insert_keywords_post($forumid, $post, $keywords){
-        global $DB;
-
-        foreach ($keywords as $keyword) {
-
-            // Insert into keyword table.
-            $lcasekeyword = strtolower($keyword['text']);
-            $record = new \stdClass();
-            $record->keyword = $lcasekeyword;
-            $record->keywordcount = 1;
-
-            try { // Try insert.
-                $keywordid = $DB->insert_record('tool_sentiment_forum_keyword', $record, true);
-            } catch (\Exception $e) { // Insert failed try update.
-                $transaction = $DB->start_delegated_transaction();
-                $keywordid = $DB->get_field('tool_sentiment_forum_keyword', 'id', array ('keyword' => $lcasekeyword));
-                $record->id = $keywordid;
-                $record->keywordcount = $record->keywordcount + 1; // Increment count
-                $DB->update_record('tool_sentiment_forum_keyword', $record);
-                $transaction->allow_commit();
-            }
-
-            // Insert into Keyword forum table.
-            $record = new \stdClass();
-            $record->keywordid = $keywordid;
-            $record->forumid = $forumid;
-            $record->keywordcount = 1;
-
-            try { // Try insert.
-                $kwforurmid = $DB->insert_record('tool_sentiment_forum_k_forum', $record, true);
-            } catch (\Exception $e) { // Insert failed try update.
-                $transaction = $DB->start_delegated_transaction();
-                $params = array ('forumid' => $record->forumid, 'keywordid' => $keywordid);
-                $kwforurmid = $DB->get_field('tool_sentiment_forum_k_forum', 'id', $params);
-                $record->id = $kwforurmid;
-                $record->keywordcount = $record->keywordcount + 1; // Increment count
-                $DB->update_record('tool_sentiment_forum_k_forum', $record);
-                $transaction->allow_commit();
-            }
-
-            // Insert into Keyword post table.
-            $record = new \stdClass();
-            $record->keywordid = $keywordid;
-            $record->postid = $post->id;
-            $record->keywordcount = 1;
-
-            try { // Try insert.
-                $kwpostid = $DB->insert_record('tool_sentiment_forum_k_post', $record, true);
-            } catch (\Exception $e) { // Insert failed try update.
-                $transaction = $DB->start_delegated_transaction();
-                $params = array ('postid' => $record->postid, 'keywordid' => $keywordid);
-                $kwpostid = $DB->get_field('tool_sentiment_forum_k_post', 'id', $params);
-                $record->id = $kwpostid;
-                $record->keywordcount = $record->keywordcount + 1; // Increment count
-                $DB->update_record('tool_sentiment_forum_k_post', $record);
-                $transaction->allow_commit();
-            }
-
-        }
+    public function insert_keywords($forumid, $post, $keywords){
+        $this->insert_keywords_concepts('keyword', $keywords, $forumid, $post);
     }
 
     /**
@@ -258,65 +274,8 @@ class analyze {
      * @param object $post The post object.
      * @param unknown $concepts
      */
-    public function insert_concepts_post($forumid, $post, $concepts){
-        global $DB;
-
-        foreach ($concepts as $concept) {
-
-            // Insert into concept table.
-            $lcaseconcept = strtolower($concept['text']);
-            $record = new \stdClass();
-            $record->concept = $lcaseconcept;
-            $record->conceptcount = 1;
-
-            try { // Try insert.
-                $conceptid = $DB->insert_record('tool_sentiment_forum_concept', $record, true);
-            } catch (\Exception $e) { // Insert failed try update.
-                $transaction = $DB->start_delegated_transaction();
-                $conceptid = $DB->get_field('tool_sentiment_forum_concept', 'id', array ('concept' => $lcaseconcept));
-                $record->id = $conceptid;
-                $record->conceptcount = $record->conceptcount + 1; // Increment count
-                $DB->update_record('tool_sentiment_forum_concept', $record);
-                $transaction->allow_commit();
-            }
-
-            // Insert into concept forum table.
-            $record = new \stdClass();
-            $record->conceptid = $conceptid;
-            $record->forumid = $forumid;
-            $record->conceptcount = 1;
-
-            try { // Try insert.
-                $kwforurmid = $DB->insert_record('tool_sentiment_forum_c_forum', $record, true);
-            } catch (\Exception $e) { // Insert failed try update.
-                $transaction = $DB->start_delegated_transaction();
-                $params = array ('forumid' => $record->forumid, 'conceptid' => $conceptid);
-                $kwforurmid = $DB->get_field('tool_sentiment_forum_c_forum', 'id', $params);
-                $record->id = $kwforurmid;
-                $record->conceptcount = $record->conceptcount + 1; // Increment count
-                $DB->update_record('tool_sentiment_forum_k_forum', $record);
-                $transaction->allow_commit();
-            }
-
-            // Insert into concept post table.
-            $record = new \stdClass();
-            $record->conceptid = $conceptid;
-            $record->postid = $post->id;
-            $record->conceptcount = 1;
-
-            try { // Try insert.
-                $kwpostid = $DB->insert_record('tool_sentiment_forum_c_post', $record, true);
-            } catch (\Exception $e) { // Insert failed try update.
-                $transaction = $DB->start_delegated_transaction();
-                $params = array ('postid' => $record->postid, 'conceptid' => $conceptid);
-                $kwpostid = $DB->get_field('tool_sentiment_forum_c_post', 'id', $params);
-                $record->id = $kwpostid;
-                $record->conceptcount = $record->conceptcount + 1; // Increment count
-                $DB->update_record('tool_sentiment_forum_k_post', $record);
-                $transaction->allow_commit();
-            }
-
-        }
+    public function insert_concepts($forumid, $post, $concepts){
+        $this->insert_keywords_concepts('concept', $concepts, $forumid, $post);
     }
 
     /**
@@ -415,10 +374,10 @@ class analyze {
             $this->insert_sentiment_post($forumid, $post, $sentiment, $emotion);
 
             // Update Database with post keywords.
-            $this->insert_keywords_post($forumid, $post, $keywords);
+            $this->insert_keywords($forumid, $post, $keywords);
 
             // Update Database with post concepts.
-            $this->insert_concepts_post($forumid, $post, $concepts);
+            $this->insert_concepts($forumid, $post, $concepts);
         }
 
         // If new posts have been analyzed update forum sentiment.
