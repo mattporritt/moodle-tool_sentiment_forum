@@ -26,12 +26,20 @@
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = array(
-        array(
-                'classname' => 'tool_sentiment_forum\task\analyze_posts',
-                'blocking' => 0,
-                'minute' => '*',
-                'hour' => '*',
-                'dayofweek' => '*',
-                'month' => '*'
-        )
+    array(
+        'classname' => 'tool_sentiment_forum\task\analyze_posts',
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+    array(
+        'classname' => 'tool_sentiment_forum\task\process_analytics',
+        'blocking' => 0,
+        'minute' => '5',
+        'hour' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    )
 );

@@ -15,20 +15,45 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Task to perform data analysis.
  *
  * @package     tool_sentiment_forum
+ * @category    task
  * @copyright   2017 Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace tool_sentiment_forum\task;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'tool_sentiment_forum';
-$plugin->release = '2018012700';
-$plugin->version = 2018012700;
-$plugin->requires = 2017051500;
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->dependencies = array(
-        'local_aws' => 2017030100
-);
+
+/**
+ * Class to perform task based data analysis.
+ *
+ * @package     tool_sentiment_forum
+ * @category    task
+ * @copyright   2017 Matt Porritt <mattp@catalyst-au.net>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class process_analytics extends \core\task\scheduled_task {
+
+    /**
+     * {@inheritDoc}
+     * @see \core\task\scheduled_task::get_name()
+     */
+    public function get_name() {
+        // Shown in admin screens.
+        return get_string('processtask', 'tool_sentiment_forum');
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see \core\task\task_base::execute()
+     */
+    public function execute() {
+        mtrace('Starting Forum Sentiment Analytic processing...');
+
+    }
+}

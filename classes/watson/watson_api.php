@@ -197,10 +197,10 @@ class watson_api {
         $sentiment = new \stdClass();
 
         $keywords = new \stdClass();
-        $keywords->limit = $this->config->maxkeywords;
+        $keywords->limit = (int)$this->config->maxkeywords;
 
         $concepts = new \stdClass();
-        $concepts->limit = $this->config->maxconcepts;
+        $concepts->limit = (int)$this->config->maxconcepts;
 
         $params = ['text' => $text,
                    'features' => [
